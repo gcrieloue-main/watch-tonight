@@ -86,7 +86,6 @@ function App() {
     if (watchedIds?.includes("" + id)) {
       return;
     }
-    console.log("add " + id);
     fetch(`http://localhost:3001/watch/${id}`).then(async (result) => {
       const m = await result;
       setWatchedIds((currentWatchIds) => currentWatchIds.concat("" + id));
@@ -97,7 +96,6 @@ function App() {
     if (!watchedIds?.includes("" + id)) {
       return;
     }
-    console.log("remove " + id);
     fetch(`http://localhost:3001/watch/delete/${id}`).then(async (result) => {
       const m = await result;
       setWatchedIds((currentWatchIds) =>
