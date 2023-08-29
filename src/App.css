@@ -1,11 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
-  background-color: #282c34;
   justify-content: center;
-  color: white;
+  min-height: 100vh;
+}
+
+main {
+  min-height: 100vh;
 }
 
 h1 {
   text-align: center;
+  margin: 10px;
 }
 
 h2 {
@@ -16,6 +24,7 @@ h2 {
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
+  margin: 10px;
 }
 
 a {
@@ -43,9 +52,10 @@ img {
   flex-direction: column;
   align-items: center;
   border: 1px solid transparent;
+  padding: 10px;
 }
 
-.movie:hover{
+.movie:hover {
   background-color: rgba(0, 0, 0, 0.2);
   border-radius: 5px;
 }
@@ -98,44 +108,44 @@ img {
 }
 
 .buttons {
- text-align: center;
- margin: 20px;
-}
-
-.buttons button {
-  min-width: 100px;
-  padding:10px;
-  font-weight: bold;
-  border-radius: 3px;
-  border: 1px solid rgba(0, 0, 0, 0.8);
-  margin: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 20px;
+  gap: 10px;
 }
 
 .menu {
-  list-style-type: none;
   margin: 0 auto;
-  text-align: center;
-  padding: 10px 0;
-  background-color: rgba(0, 0, 0, 0.2);
-}
-.menu li{
-  display: inline;
-  margin: 10px;
-  cursor: pointer;
-}
-.menu li:hover{
-  text-shadow: 1px 1px 3px rgba(255, 0, 0, 0.8);
+  padding: 10px;
+  justify-content: center;
+  align-items: center;
 }
 
-.loading{
+.loading {
   filter: blur(5px);
 }
 .loading::before {
   position: absolute;
-  top: 0; bottom: 0;
-  left: 0; right: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background: rgba(0, 0, 0, 0.35);
-  content: '';
+  content: "";
   z-index: 5;
   border-radius: 16px;
+}
+
+.rating {
+  display: flex;
+  gap: 10px;
+  margin: 10px;
+}
+
+.spinner {
+  z-index: 999;
+  position: fixed;
+  top: 50%;
+  left: 50%;
 }

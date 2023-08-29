@@ -113,11 +113,21 @@ async function getData(page, options) {
 const memoGetData = _.memoize(getData, (...args) => JSON.stringify(args));
 
 async function addTmdbMovieDetail(data) {
-  return {
-    details: await memoGetTmdbMovieDetails(data.id),
-    omdbDetails: await memoGetOmdbMovieDetails(data.original_title),
-    torrentDetails: await memoGetTorrentDetails(data.original_title),
-  };
+  let result = {};
+  try {
+    result = { ...result, details: await memoGetTmdbMovieDetails(data.id) };
+    result = {
+      ...result,
+      omdbDetails: await memoGetOmdbMovieDetails(data.original_title),
+    };
+    result = {
+      ...result,
+      torrentDetails: await memoGetTorrentDetails(data.original_title),
+    };
+  } catch (error) {
+    console.log(error);
+  }
+  return result;
 }
 
 function loadWatchedMoviesIds() {
@@ -191,8 +201,10 @@ app.get("/watch/:id", async function (req, res) {
     if (err) {
       console.error(err);
     }
-    // fichier écrit avec succès
   });
+
+  console.log("add watched " + id);
+
   res.send(alreadyWatched.concat([id]));
 });
 
@@ -211,9 +223,10 @@ app.get("/watch/delete/:id", async function (req, res) {
       if (err) {
         console.error(err);
       }
-      // fichier écrit avec succès
     }
   );
+
+  console.log("remove watched " + id);
 
   res.send(alreadyWatched.filter((existingId) => existingId != id));
 });

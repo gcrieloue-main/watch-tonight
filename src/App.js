@@ -1,6 +1,9 @@
-import "./App.css";
+import "./output.css";
 
 import { useEffect, useState } from "react";
+import { Button } from "@nextui-org/react";
+import { Tabs, Tab } from "@nextui-org/react";
+import { CircularProgress, Spinner, Tooltip } from "@nextui-org/react";
 
 function App() {
   const [movies, setMovies] = useState([]);
@@ -8,24 +11,6 @@ function App() {
   const [page, setPage] = useState(1);
   const [category, setCategory] = useState("popular");
   const [isLoading, setIsLoading] = useState(false);
-
-  let title;
-  switch (category) {
-    case "popular":
-      title = "Popular Movies";
-      break;
-    case "watched":
-      title = "Watch list";
-      break;
-    case "now_playing":
-      title = "Now playing";
-      break;
-    case "upcoming":
-      title = "Upcoming";
-      break;
-    default:
-      title = "Horror Movies";
-  }
 
   useEffect(() => {
     setPage(1);
@@ -56,10 +41,11 @@ function App() {
         if (error.name !== "AbortError") {
           console.log("error is", error);
         }
+        return null;
       })
       .then(async (result) => {
         const m = await result;
-        if (!m) return;
+        if (!m || !m.ok) return;
         const movies = await m.json();
         setMovies(movies);
         setIsLoading(false);
@@ -82,7 +68,9 @@ function App() {
   useEffect(() => {
     fetch("http://localhost:3001/watchedIds").then(async (result) => {
       const m = await result;
-      setWatchedIds(await m.json());
+      console.log("set watched ids");
+      const watchedIds = (await m.json()) || [];
+      setWatchedIds(watchedIds);
     });
   }, []);
 
@@ -95,51 +83,59 @@ function App() {
   }
 
   function addWatchdId(id) {
-    if (watchedIds.includes("" + id)) {
+    if (watchedIds?.includes("" + id)) {
       return;
     }
-
+    console.log("add " + id);
     fetch(`http://localhost:3001/watch/${id}`).then(async (result) => {
       const m = await result;
-      setWatchedIds((currentWatchIds) =>
-        setWatchedIds(currentWatchIds.concat("" + id))
-      );
+      setWatchedIds((currentWatchIds) => currentWatchIds.concat("" + id));
     });
   }
 
   function removeWatchdId(id) {
-    if (!watchedIds.includes("" + id)) {
+    if (!watchedIds?.includes("" + id)) {
       return;
     }
-
+    console.log("remove " + id);
     fetch(`http://localhost:3001/watch/delete/${id}`).then(async (result) => {
       const m = await result;
       setWatchedIds((currentWatchIds) =>
-        setWatchedIds(currentWatchIds.filter((current) => current != id))
+        currentWatchIds.filter((current) => current != "" + id)
       );
     });
   }
 
   return (
     <div className="App">
-      <ul className="menu">
-        <li onClick={() => setCategory("watched")}>Watch list</li>
-        <li onClick={() => setCategory("upcoming")}>Upcoming</li>
-        <li onClick={() => setCategory("now_playing")}>Now playing</li>
-        <li onClick={() => setCategory("popular")}>Popular movies</li>
-        <li onClick={() => setCategory("horror")}>Horror movies</li>
-      </ul>
-      <h1>{title}</h1>
+      {isLoading && (
+        <div className="spinner">
+          <Spinner size="lg" />
+        </div>
+      )}
+      <div className="flex w-full flex-col menu">
+        <Tabs
+          aria-label="Tabs radius"
+          onSelectionChange={(category) => setCategory(category)}
+        >
+          <Tab key="watched" title="Watch list" />
+          <Tab key="upcoming" title="Upcoming" />
+          <Tab key="now_playing" title="Now playing" />
+          <Tab key="popular" title="Popular movies" />
+          <Tab key="horror" title="Horror movies" />
+        </Tabs>
+      </div>
+      {/* <h1>{title}</h1> */}
       {/* <pre>Watched ids : {JSON.stringify(watchedIds)}</pre> */}
       {/* <pre>{JSON.stringify(movies?.results?.[0], null, 2)}</pre> */}
       <div className={"movies" + (isLoading ? " loading" : " ")}>
-        {category == "watched" && !(movies?.results?.length > 0) && (
+        {category === "watched" && !(movies?.results?.length > 0) && (
           <div>
             <p>No watched movie !</p>
           </div>
         )}
         {movies?.results
-          ?.filter((result) => result.details.status_code != 34)
+          ?.filter((result) => result.details.status_code !== 34)
           ?.map((result) => (
             <div className="movie" key={result.details.original_title}>
               <h2>{result.details.original_title}</h2>
@@ -180,49 +176,83 @@ function App() {
                 />
               </div>
               <div className="rating">
-                <ul>
-                  {result.details.imdb_id && (
-                    <li>
-                      <a
-                        href={
-                          "https://www.imdb.com/title/" +
-                          result.details.imdb_id +
-                          "/"
+                {result.details.imdb_id && (
+                  <div className="imdb_rating">
+                    <a
+                      href={
+                        "https://www.imdb.com/title/" +
+                        result.details.imdb_id +
+                        "/"
+                      }
+                    >
+                      <span>IMDB</span>
+                      <CircularProgress
+                        aria-label="Loading..."
+                        size="lg"
+                        value={
+                          result.omdbDetails.imdbRating &&
+                          result.omdbDetails.imdbRating !== "N/A"
+                            ? result.omdbDetails.imdbRating * 10
+                            : 0
                         }
-                      >
-                        IMDB
-                      </a>
-                      <span>
-                        {" "}
-                        :{" "}
-                        <strong>
-                          {result.omdbDetails.imdbRating || "N/A"}
-                        </strong>{" "}
-                      </span>
-                    </li>
-                  )}
-                  <li>
-                    TMDB : {result.details.vote_average} (
-                    {result.details.vote_count})
-                  </li>
-                </ul>
-              </div>
-              <p className="download">
-                {result.torrentDetails?.seeds > 0 && (
-                  <a href={result.torrentDetails.magnet}>
-                    Download {result.torrentDetails.title} (
-                    {result.torrentDetails.size})
-                  </a>
+                        color={
+                          result.omdbDetails.imdbRating < 6
+                            ? "warning"
+                            : "success"
+                        }
+                        showValueLabel={true}
+                      />
+                    </a>
+                  </div>
                 )}
-              </p>
+                <div className="tmdb_rating">
+                  <span>TMDB</span>
+                  <CircularProgress
+                    aria-label="Loading..."
+                    size="lg"
+                    value={
+                      result.details.vote_averag &&
+                      result.details.vote_averag !== "N/A"
+                        ? result.details.vote_averag * 10
+                        : 0
+                    }
+                    color={
+                      result.details.vote_average < 6 ? "warning" : "success"
+                    }
+                    showValueLabel={true}
+                  />
+                </div>
+              </div>
+              {result.torrentDetails?.seeds > 0 && (
+                <Tooltip
+                  placement="bottom"
+                  content={
+                    <div className="px-1 py-2">
+                      <div className="text-small font-bold">Download</div>
+                      <div className="text-tiny">
+                        {result.torrentDetails.title}
+                      </div>
+                      <div className="text-tiny">
+                        {result.torrentDetails.size}
+                      </div>
+                    </div>
+                  }
+                >
+                  <Button variant="bordered">
+                    Download ({result.torrentDetails.size})
+                  </Button>
+                </Tooltip>
+              )}
             </div>
           ))}
       </div>
       {category != "watched" && (
         <div className="buttons">
-          {page > 1 && <button onClick={previous}>PREVIOUS</button>}
-          {page > 1 && page}
-          <button onClick={next}>NEXT</button>
+          <Button isDisabled={page < 2} onClick={previous}>
+            PREVIOUS
+          </Button>
+          {page}
+          <Button onClick={next}>NEXT</Button>
         </div>
       )}
     </div>
