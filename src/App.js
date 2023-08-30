@@ -5,10 +5,7 @@ import { Button } from "@nextui-org/react";
 import { Tabs, Tab } from "@nextui-org/react";
 import { CircularProgress, Spinner, Tooltip } from "@nextui-org/react";
 
-async function fetchData(url, callback) {
-  const controller = new AbortController();
-  const signal = controller.signal;
-
+async function fetchData(url, callback, signal) {
   try {
     await fetch(url, {
       signal: signal,
@@ -19,12 +16,10 @@ async function fetchData(url, callback) {
       callback(json);
     });
   } catch (error) {
-    if (error.name === "AbortError") {
-      console.log("AbortError: Fetch request aborted");
+    if (error.name !== "AbortError") {
+      console.log(error);
     }
   }
-
-  return controller;
 }
 
 function App() {
@@ -53,49 +48,56 @@ function App() {
     }
     setIsLoading(true);
 
-    const controller = fetchData(url, (json) => {
-      setMovies(json);
-      setIsLoading(false);
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    fetchData(
+      url,
+      (json) => {
+        setMovies(json);
+        setIsLoading(false);
+      },
+      signal
+    );
 
     return () => {
-      try {
-        controller.abort();
-      } catch (err) {
-        console.log("AbortError: Fetch request aborted");
-      }
+      controller?.abort();
     };
   }, [page, category]);
 
   useEffect(() => {
-    async function get() {
-      if (category === "watched") {
-        const controller = fetchData(
-          "http://localhost:3001/watched",
-          (json) => {
-            setMovies(json);
-          }
-        );
+    if (category === "watched") {
+      const controller = new AbortController();
+      const signal = controller.signal;
+      fetchData(
+        "http://localhost:3001/watched",
+        (json) => {
+          setMovies(json);
+        },
+        signal
+      );
 
-        return () => {
-          controller.abort();
-        };
-      }
+      return () => {
+        controller.abort();
+      };
     }
   }, [watchedIds]);
 
   useEffect(() => {
-    const controller = fetchData("http://localhost:3001/watchedIds", (json) => {
-      const watchedIds = json || [];
-      setWatchedIds(watchedIds);
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    fetchData(
+      "http://localhost:3001/watchedIds",
+      (json) => {
+        const watchedIds = json || [];
+        setWatchedIds(watchedIds);
+      },
+      signal
+    );
 
     return () => {
-      try {
-        controller.abort();
-      } catch (err) {
-        console.log("AbortError: Fetch request aborted");
-      }
+      controller.abort();
     };
   }, []);
 
@@ -113,10 +115,10 @@ function App() {
     switch (source) {
       case "Internet Movie Database":
         return "IMDB";
-        break;
       case "Rotten Tomatoes":
         return "RT";
-        break;
+      case "Metacritic":
+        return "MT";
       default:
         return source;
     }
@@ -280,9 +282,9 @@ function poster(watchedIds, result, addWatchdId, removeWatchdId) {
 
 function ratings(result, mapRatingSource, normalizeRating) {
   return (
-    <div className="rating">
+    <div className="ratings">
       {result.omdbDetails?.Ratings?.map((rating) => (
-        <div key={rating.Source}>
+        <div key={rating.Source} className="rating">
           <a
             href={"https://www.imdb.com/title/" + result.details.imdb_id + "/"}
           >
@@ -297,6 +299,22 @@ function ratings(result, mapRatingSource, normalizeRating) {
           </a>
         </div>
       ))}
+      {!result?.omdbDetails?.Ratings?.length && result.details.imdb_id && (
+        <div className="rating">
+          <a
+            href={"https://www.imdb.com/title/" + result.details.imdb_id + "/"}
+          >
+            <span>TMDB</span>
+            <CircularProgress
+              aria-label="Loading..."
+              size="lg"
+              value={result.details.vote_average * 10}
+              color={result.details.vote_average < 6 ? "warning" : "success"}
+              showValueLabel={true}
+            />
+          </a>
+        </div>
+      )}
     </div>
   );
 }

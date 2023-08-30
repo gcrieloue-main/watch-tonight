@@ -3521,10 +3521,20 @@ img {
   border-radius: 16px;
 }
 
-.rating {
+.ratings {
   display: flex;
-  gap: 10px;
+  /* gap: 10px; */
   margin: 10px;
+}
+
+.rating a {
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin: 10px;
+  text-align: center;
 }
 
 .spinner {
