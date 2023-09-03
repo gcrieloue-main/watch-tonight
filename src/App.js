@@ -332,7 +332,7 @@ function torrentButon(result) {
           </div>
         }
       >
-        <Button variant="bordered">
+        <Button variant="bordered" onClick={()=>window.location.href = result.torrentDetails.magnet}>
           Download ({result.torrentDetails.size})
         </Button>
       </Tooltip>
