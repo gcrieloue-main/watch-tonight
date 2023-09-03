@@ -22,16 +22,13 @@ function App() {
       if (response.ok) setMovies(result);
       setIsLoading(false);
     },
-    [get, response]
+    [get, response],
   );
 
-  const loadWatchedIds = useCallback(
-    async () => {
-      const result = await get("/watchedIds");
-      if (response.ok) setWatchedIds(result);
-    },
-    [get, response]
-  );
+  const loadWatchedIds = useCallback(async () => {
+    const result = await get("/watchedIds");
+    if (response.ok) setWatchedIds(result);
+  }, [get, response]);
 
   useEffect(() => {
     setPage(1);
@@ -85,7 +82,7 @@ function App() {
     fetch(`http://localhost:3001/watch/delete/${id}`).then(async (result) => {
       const m = await result;
       setWatchedIds((currentWatchIds) =>
-        currentWatchIds.filter((current) => current != "" + id)
+        currentWatchIds.filter((current) => current != "" + id),
       );
     });
   }

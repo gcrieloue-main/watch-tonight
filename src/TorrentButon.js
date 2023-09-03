@@ -10,6 +10,10 @@ import { Tooltip } from "@nextui-org/react";
 import { ChevronDownIcon } from "./ChevronDownicon";
 import { useState } from "react";
 
+function formatTorrentName(desc) {
+  return desc.replaceAll(".", " ").replaceAll("5 1", "5.1");
+}
+
 export function TorrentButon({ result }) {
   const [dropDownOpen, setDropDownOpen] = useState(false);
 
@@ -36,7 +40,11 @@ export function TorrentButon({ result }) {
             Download ({result.torrentDetails.size})
           </Button>
         </Tooltip>
-        <Dropdown placement="bottom-end" onOpenChange={setDropDownOpen}>
+        <Dropdown
+          placement="bottom-end"
+          onOpenChange={setDropDownOpen}
+          className="dark text-foreground bg-background"
+        >
           <DropdownTrigger>
             <Button isIconOnly>
               <ChevronDownIcon />
@@ -49,7 +57,7 @@ export function TorrentButon({ result }) {
             className="max-w-[300px]"
           >
             <DropdownItem
-              description={result.torrentDetails?.title}
+              description={formatTorrentName(result.torrentDetails?.title)}
               key="pirate"
               onClick={() =>
                 (window.location.href = result.torrentDetails.magnet)
@@ -58,7 +66,9 @@ export function TorrentButon({ result }) {
               ThePirateBay
             </DropdownItem>
             <DropdownItem
-              description={result.torrentDetails.torrent9?.title}
+              description={formatTorrentName(
+                result.torrentDetails.torrent9?.title,
+              )}
               key="torrent9"
               onClick={() =>
                 (window.location.href = result.torrentDetails.torrent9?.magnet)

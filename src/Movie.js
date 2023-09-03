@@ -25,12 +25,7 @@ function mapRatingSource(source) {
   }
 }
 
-export function Movie({
-  result,
-  watchedIds,
-  addWatchdId,
-  removeWatchdId,
-}) {
+export function Movie({ result, watchedIds, addWatchdId, removeWatchdId }) {
   return (
     <div className="movie" key={result?.details?.original_title}>
       <h2>{result?.details?.original_title}</h2>
