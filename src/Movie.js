@@ -34,9 +34,7 @@ export function Movie({
         mapRatingSource={mapRatingSource}
         normalizeRating={normalizeRating}
       />
-      <TorrentButon
-        result={result}
-      />
+      <TorrentButon result={result} />
     </div>
   );
 }

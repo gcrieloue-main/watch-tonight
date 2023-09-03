@@ -1,6 +1,7 @@
 import "./output.css";
 
-import { useEffect, useState } from "react";
+import { useFetch } from "use-http";
+import { useEffect, useState, useCallback } from "react";
 import { Spinner } from "@nextui-org/react";
 import { Pagination } from "./Pagination";
 import { Menu } from "./Menu";
@@ -29,41 +30,31 @@ function App() {
   const [page, setPage] = useState(1);
   const [category, setCategory] = useState("now_playing");
   const [isLoading, setIsLoading] = useState(false);
+  const { get, post, response, loading, error } = useFetch({ data: [] });
+
+  const loadMovies = useCallback(
+    async (url) => {
+      setIsLoading(true);
+      const result = await get(url);
+      if (response.ok) setMovies(result);
+      setIsLoading(false);
+    },
+    [get, response],
+  );
 
   useEffect(() => {
     setPage(1);
   }, [category]);
 
   useEffect(() => {
-    let url;
-    if (category === "watched") {
-      url = "http://localhost:3001/watched";
-    } else if (category === "popular") {
-      url = "http://localhost:3001/movies/popular/" + page;
-    } else if (category === "upcoming") {
-      url = "http://localhost:3001/movies/upcoming/" + page;
-    } else if (category === "now_playing") {
-      url = "http://localhost:3001/movies/now_playing/" + page;
-    } else {
-      url = "http://localhost:3001/movies/" + page;
-    }
-    setIsLoading(true);
-
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    fetchData(
-      url,
-      (json) => {
-        setMovies(json);
-        setIsLoading(false);
-      },
-      signal
-    );
-
-    return () => {
-      controller?.abort();
+    const urls = {
+      watched: "watched",
+      popular: "movies/popular/" + page,
+      upcoming: "movies/upcoming/" + page,
+      now_playing: "movies/now_playing/" + page,
+      default: "movies/" + page,
     };
+    loadMovies(urls[category] || urls["default"]);
   }, [page, category]);
 
   useEffect(() => {
@@ -75,7 +66,7 @@ function App() {
         (json) => {
           setMovies(json);
         },
-        signal
+        signal,
       );
 
       return () => {
@@ -94,7 +85,7 @@ function App() {
         const watchedIds = json || [];
         setWatchedIds(watchedIds);
       },
-      signal
+      signal,
     );
 
     return () => {
@@ -142,7 +133,7 @@ function App() {
     fetch(`http://localhost:3001/watch/delete/${id}`).then(async (result) => {
       const m = await result;
       setWatchedIds((currentWatchIds) =>
-        currentWatchIds.filter((current) => current != "" + id)
+        currentWatchIds.filter((current) => current != "" + id),
       );
     });
   }
