@@ -8,8 +8,11 @@ import {
 } from "@nextui-org/react";
 import { Tooltip } from "@nextui-org/react";
 import { ChevronDownIcon } from "./ChevronDownicon";
+import { useState } from "react";
 
-export function TorrentButon({ result, dropDownOpen, setDropDownOpen }) {
+export function TorrentButon({ result }) {
+  const [dropDownOpen, setDropDownOpen] = useState(false);
+
   return (
     result.torrentDetails?.seeds > 0 && (
       <ButtonGroup variant="flat">

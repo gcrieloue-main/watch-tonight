@@ -2,7 +2,6 @@ import "./output.css";
 
 import { useEffect, useState } from "react";
 import { Spinner } from "@nextui-org/react";
-import { drop } from "lodash";
 import { Pagination } from "./Pagination";
 import { Menu } from "./Menu";
 import { Movie } from "./Movie";
@@ -30,7 +29,6 @@ function App() {
   const [page, setPage] = useState(1);
   const [category, setCategory] = useState("now_playing");
   const [isLoading, setIsLoading] = useState(false);
-  const [dropDownOpen, setDropDownOpen] = useState(false);
 
   useEffect(() => {
     setPage(1);
@@ -104,15 +102,6 @@ function App() {
     };
   }, []);
 
-  function normalizeRating(rating) {
-    if (rating?.includes("%")) {
-      return +rating.replace(/[^0-9]/g, "");
-    } else if (rating?.includes("/100")) {
-      return +rating.replace("/100", "");
-    } else if (rating?.includes("/10")) {
-      return +rating.replace("/10", "") * 10;
-    } else return 0;
-  }
 
   function mapRatingSource(source) {
     switch (source) {
@@ -185,9 +174,6 @@ function App() {
               addWatchdId={addWatchdId}
               removeWatchdId={removeWatchdId}
               mapRatingSource={mapRatingSource}
-              normalizeRating={normalizeRating}
-              dropDownOpen={dropDownOpen}
-              setDropDownOpen={setDropDownOpen}
             />
           ))}
       </div>

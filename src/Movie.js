@@ -2,15 +2,22 @@ import { Poster } from "./Poster";
 import { Ratings } from "./Ratings";
 import { TorrentButon } from "./TorrentButon";
 
+function normalizeRating(rating) {
+  if (rating?.includes("%")) {
+    return +rating.replace(/[^0-9]/g, "");
+  } else if (rating?.includes("/100")) {
+    return +rating.replace("/100", "");
+  } else if (rating?.includes("/10")) {
+    return +rating.replace("/10", "") * 10;
+  } else return 0;
+}
+
 export function Movie({
   result,
   watchedIds,
   addWatchdId,
   removeWatchdId,
   mapRatingSource,
-  normalizeRating,
-  dropDownOpen,
-  setDropDownOpen,
 }) {
   return (
     <div className="movie" key={result?.details?.original_title}>
@@ -29,8 +36,6 @@ export function Movie({
       />
       <TorrentButon
         result={result}
-        dropDownOpen={dropDownOpen}
-        setDropDownOpen={setDropDownOpen}
       />
     </div>
   );
