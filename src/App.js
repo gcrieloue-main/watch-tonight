@@ -102,7 +102,6 @@ function App() {
     };
   }, []);
 
-
   function mapRatingSource(source) {
     switch (source) {
       case "Internet Movie Database":
@@ -177,12 +176,14 @@ function App() {
             />
           ))}
       </div>
-      <Pagination
-        category={category}
-        page={page}
-        previous={previous}
-        next={next}
-      />
+      {category != "watched" && (
+        <Pagination
+          category={category}
+          page={page}
+          previous={previous}
+          next={next}
+        />
+      )}
     </div>
   );
 }

@@ -1,15 +1,13 @@
 import { Button } from "@nextui-org/react";
 
-export function Pagination({ category, page, previous, next }) {
+export function Pagination({ page, previous, next }) {
   return (
-    category != "watched" && (
-      <div className="buttons">
-        <Button isDisabled={page < 2} onClick={previous}>
-          PREVIOUS
-        </Button>
-        {page}
-        <Button onClick={next}>NEXT</Button>
-      </div>
-    )
+    <div className="buttons">
+      <Button isDisabled={page < 2} onClick={previous}>
+        PREVIOUS
+      </Button>
+      {page}
+      <Button onClick={next}>NEXT</Button>
+    </div>
   );
 }
