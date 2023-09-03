@@ -1,5 +1,6 @@
 const TorrentSearchApi = require("torrent-search-api");
 TorrentSearchApi.enableProvider("ThePirateBay");
+TorrentSearchApi.enableProvider("Torrent9");
 
 const express = require("express");
 const fs = require("fs");
@@ -11,7 +12,7 @@ app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
+    "Origin, X-Requested-With, Content-Type, Accept",
   );
   next();
 });
@@ -21,7 +22,7 @@ async function getTmdbMovies(
   options = {
     genre: 27,
     type: "none",
-  }
+  },
 ) {
   console.log(page, options);
   const pageId = page || 1;
@@ -90,8 +91,28 @@ async function getTorrentDetails(title) {
   if (!title) {
     return;
   }
-  const torrents = await TorrentSearchApi.search(title, "Video", 1);
-  return torrents[0];
+  const torrents = await TorrentSearchApi.search(
+    ["ThePirateBay"],
+    title,
+    "Video",
+    1,
+  );
+  const torrent9 = await TorrentSearchApi.search(
+    ["Torrent9"],
+    title,
+    "Movies",
+    1,
+  );
+
+  const firstTorrent9 = torrent9?.[0];
+  const firstTorrent9Magnet = firstTorrent9
+    ? await TorrentSearchApi.getMagnet(torrent9[0])
+    : null;
+
+  return {
+    ...torrents[0],
+    torrent9: { ...firstTorrent9, magnet: firstTorrent9Magnet },
+  };
 }
 
 const memoGetTorrentDetails = _.memoize(getTorrentDetails);
@@ -104,7 +125,7 @@ async function getData(page, options) {
   const resultsWithDetails = await Promise.all(
     data.results?.map(async (data) => {
       return await addTmdbMovieDetail(data);
-    })
+    }),
   );
 
   return { ...data, results: resultsWithDetails };
@@ -142,7 +163,7 @@ async function loadWatchedMovies(ids) {
       ids.map(async (id) => {
         const detail = await memoGetTmdbMovieDetails(id);
         return addTmdbMovieDetail(detail);
-      })
+      }),
     ),
   };
 }
@@ -223,7 +244,7 @@ app.get("/watch/delete/:id", async function (req, res) {
       if (err) {
         console.error(err);
       }
-    }
+    },
   );
 
   console.log("remove watched " + id);
@@ -243,5 +264,9 @@ app.get("/watched", async function (req, res) {
 });
 
 app.listen(port, () => {
+  console.log(
+    "Active torrent providers :",
+    TorrentSearchApi.getActiveProviders(),
+  );
   console.log(`Movie DB on port ${port}`);
 });

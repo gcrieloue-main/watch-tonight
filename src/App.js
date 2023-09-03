@@ -1,9 +1,11 @@
 import "./output.css";
 
 import { useEffect, useState } from "react";
-import { Button } from "@nextui-org/react";
-import { Tabs, Tab } from "@nextui-org/react";
-import { CircularProgress, Spinner, Tooltip } from "@nextui-org/react";
+import { Spinner } from "@nextui-org/react";
+import { drop } from "lodash";
+import { Pagination } from "./Pagination";
+import { Menu } from "./Menu";
+import { Movie } from "./Movie";
 
 async function fetchData(url, callback, signal) {
   try {
@@ -28,6 +30,7 @@ function App() {
   const [page, setPage] = useState(1);
   const [category, setCategory] = useState("now_playing");
   const [isLoading, setIsLoading] = useState(false);
+  const [dropDownOpen, setDropDownOpen] = useState(false);
 
   useEffect(() => {
     setPage(1);
@@ -163,8 +166,7 @@ function App() {
           <Spinner size="lg" />
         </div>
       )}
-      {menu(setCategory, category)}
-      {/* <h1>{title}</h1> */}
+      <Menu setCategory={setCategory} category={category} />
       {/* <pre>Watched ids : {JSON.stringify(watchedIds)}</pre> */}
       {/* <pre>{JSON.stringify(movies?.results?.[0], null, 2)}</pre> */}
       <div className={"movies" + (isLoading ? " loading" : " ")}>
@@ -175,168 +177,27 @@ function App() {
         )}
         {movies?.results
           ?.filter((result) => result.details.status_code !== 34)
-          ?.map((result) =>
-            movie(
-              result,
-              watchedIds,
-              addWatchdId,
-              removeWatchdId,
-              mapRatingSource,
-              normalizeRating
-            )
-          )}
+          ?.map((result) => (
+            <Movie
+              key={result.details.original_title}
+              result={result}
+              watchedIds={watchedIds}
+              addWatchdId={addWatchdId}
+              removeWatchdId={removeWatchdId}
+              mapRatingSource={mapRatingSource}
+              normalizeRating={normalizeRating}
+              dropDownOpen={dropDownOpen}
+              setDropDownOpen={setDropDownOpen}
+            />
+          ))}
       </div>
-      {pagination(category, page, previous, next)}
-    </div>
-  );
-}
-
-function pagination(category, page, previous, next) {
-  return (
-    category != "watched" && (
-      <div className="buttons">
-        <Button isDisabled={page < 2} onClick={previous}>
-          PREVIOUS
-        </Button>
-        {page}
-        <Button onClick={next}>NEXT</Button>
-      </div>
-    )
-  );
-}
-
-function menu(setCategory, category) {
-  return (
-    <div className="flex w-full flex-col menu">
-      <Tabs
-        aria-label="Tabs radius"
-        onSelectionChange={(category) => setCategory(category)}
-        defaultSelectedKey={category}
-      >
-        <Tab key="watched" title="Watch list" />
-        <Tab key="upcoming" title="Upcoming" />
-        <Tab key="now_playing" title="Now playing" />
-        <Tab key="popular" title="Popular movies" />
-        <Tab key="horror" title="Horror movies" />
-      </Tabs>
-    </div>
-  );
-}
-
-function movie(
-  result,
-  watchedIds,
-  addWatchdId,
-  removeWatchdId,
-  mapRatingSource,
-  normalizeRating
-) {
-  return (
-    <div className="movie" key={result.details.original_title}>
-      <h2>{result.details.original_title}</h2>
-      <h3>{result.details.release_date}</h3>
-      {poster(watchedIds, result, addWatchdId, removeWatchdId)}
-      {ratings(result, mapRatingSource, normalizeRating)}
-      {torrentButon(result)}
-    </div>
-  );
-}
-
-function poster(watchedIds, result, addWatchdId, removeWatchdId) {
-  return (
-    <div className="poster">
-      {!watchedIds?.includes("" + result.details.id) && (
-        <span
-          className="watch_action watch__add"
-          onClick={() => addWatchdId(result.details.id)}
-        >
-          +
-        </span>
-      )}
-      {watchedIds?.includes("" + result.details.id) && (
-        <span
-          className="watch_action watch__add"
-          onClick={() => removeWatchdId(result.details.id)}
-        >
-          -
-        </span>
-      )}
-      {result.omdbDetails.imdbRating >= 6 &&
-        result.omdbDetails.imdbRating < 7 && (
-          <span className="approved">✓</span>
-        )}
-      {result.omdbDetails.imdbRating >= 7 && (
-        <span className="approved approved_plus">✓+</span>
-      )}
-      <img
-        className={result.omdbDetails.imdbRating < 5 ? "grayscale" : ""}
-        loading="lazy"
-        src={
-          "https://www.themoviedb.org/t/p/w300_and_h450_bestv2" +
-          result.details.poster_path
-        }
+      <Pagination
+        category={category}
+        page={page}
+        previous={previous}
+        next={next}
       />
     </div>
-  );
-}
-
-function ratings(result, mapRatingSource, normalizeRating) {
-  return (
-    <div className="ratings">
-      {result.omdbDetails?.Ratings?.map((rating) => (
-        <div key={rating.Source} className="rating">
-          <a
-            href={"https://www.imdb.com/title/" + result.details.imdb_id + "/"}
-          >
-            <span>{mapRatingSource(rating.Source)}</span>
-            <CircularProgress
-              aria-label="Loading..."
-              size="lg"
-              value={normalizeRating(rating.Value)}
-              color={normalizeRating(rating.Value) < 60 ? "warning" : "success"}
-              showValueLabel={true}
-            />
-          </a>
-        </div>
-      ))}
-      {!result?.omdbDetails?.Ratings?.length && result.details.imdb_id && (
-        <div className="rating">
-          <a
-            href={"https://www.imdb.com/title/" + result.details.imdb_id + "/"}
-          >
-            <span>TMDB</span>
-            <CircularProgress
-              aria-label="Loading..."
-              size="lg"
-              value={result.details.vote_average * 10}
-              color={result.details.vote_average < 6 ? "warning" : "success"}
-              showValueLabel={true}
-            />
-          </a>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function torrentButon(result) {
-  return (
-    result.torrentDetails?.seeds > 0 && (
-      <Tooltip
-        placement="bottom"
-        content={
-          <div className="px-1 py-2">
-            <div className="text-small font-bold">Download</div>
-            <div className="text-tiny">{result.torrentDetails.title}</div>
-            <div className="text-tiny">{result.torrentDetails.size}</div>
-          </div>
-        }
-      >
-        <Button variant="bordered" onClick={()=>window.location.href = result.torrentDetails.magnet}>
-          Download ({result.torrentDetails.size})
-        </Button>
-      </Tooltip>
-    )
   );
 }
 
