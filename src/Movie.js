@@ -12,12 +12,24 @@ function normalizeRating(rating) {
   } else return 0;
 }
 
+function mapRatingSource(source) {
+  switch (source) {
+    case "Internet Movie Database":
+      return "IMDB";
+    case "Rotten Tomatoes":
+      return "RT";
+    case "Metacritic":
+      return "MT";
+    default:
+      return source;
+  }
+}
+
 export function Movie({
   result,
   watchedIds,
   addWatchdId,
   removeWatchdId,
-  mapRatingSource,
 }) {
   return (
     <div className="movie" key={result?.details?.original_title}>

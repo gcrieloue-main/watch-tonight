@@ -7,23 +7,6 @@ import { Pagination } from "./Pagination";
 import { Menu } from "./Menu";
 import { Movie } from "./Movie";
 
-async function fetchData(url, callback, signal) {
-  try {
-    await fetch(url, {
-      signal: signal,
-    }).then(async (result) => {
-      const m = await result;
-      if (!m || !m.ok) return;
-      const json = await m.json();
-      callback(json);
-    });
-  } catch (error) {
-    if (error.name !== "AbortError") {
-      console.log(error);
-    }
-  }
-}
-
 function App() {
   const [movies, setMovies] = useState([]);
   const [watchedIds, setWatchedIds] = useState([]);
@@ -39,7 +22,15 @@ function App() {
       if (response.ok) setMovies(result);
       setIsLoading(false);
     },
-    [get, response],
+    [get, response]
+  );
+
+  const loadWatchedIds = useCallback(
+    async () => {
+      const result = await get("/watchedIds");
+      if (response.ok) setWatchedIds(result);
+    },
+    [get, response]
   );
 
   useEffect(() => {
@@ -59,52 +50,13 @@ function App() {
 
   useEffect(() => {
     if (category === "watched") {
-      const controller = new AbortController();
-      const signal = controller.signal;
-      fetchData(
-        "http://localhost:3001/watched",
-        (json) => {
-          setMovies(json);
-        },
-        signal,
-      );
-
-      return () => {
-        controller.abort();
-      };
+      loadMovies("/watched");
     }
   }, [watchedIds]);
 
   useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    fetchData(
-      "http://localhost:3001/watchedIds",
-      (json) => {
-        const watchedIds = json || [];
-        setWatchedIds(watchedIds);
-      },
-      signal,
-    );
-
-    return () => {
-      controller.abort();
-    };
+    loadWatchedIds();
   }, []);
-
-  function mapRatingSource(source) {
-    switch (source) {
-      case "Internet Movie Database":
-        return "IMDB";
-      case "Rotten Tomatoes":
-        return "RT";
-      case "Metacritic":
-        return "MT";
-      default:
-        return source;
-    }
-  }
 
   function next() {
     setPage((currentPage) => currentPage + 1);
@@ -133,7 +85,7 @@ function App() {
     fetch(`http://localhost:3001/watch/delete/${id}`).then(async (result) => {
       const m = await result;
       setWatchedIds((currentWatchIds) =>
-        currentWatchIds.filter((current) => current != "" + id),
+        currentWatchIds.filter((current) => current != "" + id)
       );
     });
   }
@@ -163,7 +115,6 @@ function App() {
               watchedIds={watchedIds}
               addWatchdId={addWatchdId}
               removeWatchdId={removeWatchdId}
-              mapRatingSource={mapRatingSource}
             />
           ))}
       </div>
