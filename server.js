@@ -67,8 +67,6 @@ async function getTmdbMovieDetails(id) {
   ).json();
 }
 
-const memoGetTmdbMovieDetails = _.memoize(getTmdbMovieDetails);
-
 async function getOmdbMovieDetails(title) {
   // const movies =  await (await fetch('http://www.omdbapi.com/?apikey=f33929a7&t=star+wars')).json()
   // console.log(movies);
@@ -85,18 +83,19 @@ async function getOmdbMovieDetails(title) {
   return data;
 }
 
-const memoGetOmdbMovieDetails = _.memoize(getOmdbMovieDetails);
-
 async function getTorrentDetails(title) {
   if (!title) {
     return;
   }
-  const torrents = await TorrentSearchApi.search(
+  const pirateBay = await TorrentSearchApi.search(
     ["ThePirateBay"],
     title,
     "Video",
     1,
   );
+
+  const firstPirateBayTorrent = pirateBay[0];
+
   const torrent9 = await TorrentSearchApi.search(
     ["Torrent9"],
     title,
@@ -104,18 +103,18 @@ async function getTorrentDetails(title) {
     1,
   );
 
+  console.log(title, torrent9);
+
   const firstTorrent9 = torrent9?.[0];
   const firstTorrent9Magnet = firstTorrent9
     ? await TorrentSearchApi.getMagnet(torrent9[0])
     : null;
 
   return {
-    ...torrents[0],
+    pirateBay: firstPirateBayTorrent,
     torrent9: { ...firstTorrent9, magnet: firstTorrent9Magnet },
   };
 }
-
-const memoGetTorrentDetails = _.memoize(getTorrentDetails);
 
 async function getData(page, options) {
   console.log("# Query data...");
@@ -130,8 +129,6 @@ async function getData(page, options) {
 
   return { ...data, results: resultsWithDetails };
 }
-
-const memoGetData = _.memoize(getData, (...args) => JSON.stringify(args));
 
 async function addTmdbMovieDetail(data) {
   let result = {};
@@ -167,6 +164,11 @@ async function loadWatchedMovies(ids) {
     ),
   };
 }
+
+const memoGetTmdbMovieDetails = _.memoize(getTmdbMovieDetails);
+const memoGetOmdbMovieDetails = _.memoize(getOmdbMovieDetails);
+const memoGetTorrentDetails = _.memoize(getTorrentDetails);
+const memoGetData = _.memoize(getData, (...args) => JSON.stringify(args));
 
 memoGetData(1);
 

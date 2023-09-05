@@ -13,13 +13,16 @@ function App() {
   const [page, setPage] = useState(1);
   const [category, setCategory] = useState("now_playing");
   const [isLoading, setIsLoading] = useState(false);
-  const { get, post, response, loading, error } = useFetch({ data: [] });
+  const { get, response } = useFetch({ data: [] });
 
   const loadMovies = useCallback(
     async (url) => {
-      setIsLoading(true);
+      const loadingTimeout = setTimeout(() => {
+        setIsLoading(true);
+      }, 300);
       const result = await get(url);
       if (response.ok) setMovies(result);
+      clearTimeout(loadingTimeout);
       setIsLoading(false);
     },
     [get, response],
@@ -43,17 +46,17 @@ function App() {
       default: "movies/" + page,
     };
     loadMovies(urls[category] || urls["default"]);
-  }, [page, category]);
+  }, [page, category, loadMovies]);
 
   useEffect(() => {
     if (category === "watched") {
       loadMovies("/watched");
     }
-  }, [watchedIds]);
+  }, [category, watchedIds, loadMovies]);
 
   useEffect(() => {
     loadWatchedIds();
-  }, []);
+  }, [loadWatchedIds]);
 
   function next() {
     setPage((currentPage) => currentPage + 1);
@@ -69,8 +72,7 @@ function App() {
     if (watchedIds?.includes("" + id)) {
       return;
     }
-    fetch(`http://localhost:3001/watch/${id}`).then(async (result) => {
-      const m = await result;
+    fetch(`http://localhost:3001/watch/${id}`).then(async () => {
       setWatchedIds((currentWatchIds) => currentWatchIds.concat("" + id));
     });
   }
@@ -79,10 +81,9 @@ function App() {
     if (!watchedIds?.includes("" + id)) {
       return;
     }
-    fetch(`http://localhost:3001/watch/delete/${id}`).then(async (result) => {
-      const m = await result;
+    fetch(`http://localhost:3001/watch/delete/${id}`).then(async () => {
       setWatchedIds((currentWatchIds) =>
-        currentWatchIds.filter((current) => current != "" + id),
+        currentWatchIds.filter((current) => current !== "" + id),
       );
     });
   }
@@ -115,12 +116,13 @@ function App() {
             />
           ))}
       </div>
-      {category != "watched" && (
+      {category !== "watched" && (
         <Pagination
           category={category}
           page={page}
           previous={previous}
           next={next}
+          isLoading={isLoading}
         />
       )}
     </div>

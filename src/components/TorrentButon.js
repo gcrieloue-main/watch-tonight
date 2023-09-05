@@ -11,14 +11,16 @@ import { ChevronDownIcon } from "./ChevronDownicon";
 import { useState } from "react";
 
 function formatTorrentName(desc) {
-  return desc.replaceAll(".", " ").replaceAll("5 1", "5.1");
+  return desc?.replaceAll(".", " ").replaceAll("5 1", "5.1");
 }
 
 export function TorrentButon({ result }) {
   const [dropDownOpen, setDropDownOpen] = useState(false);
 
+  const firstTorrent = Object.values(result.torrentDetails)[0];
+
   return (
-    result.torrentDetails?.seeds > 0 && (
+    firstTorrent?.seeds > 0 && (
       <ButtonGroup variant="flat">
         <Tooltip
           isDisabled={dropDownOpen}
@@ -26,18 +28,16 @@ export function TorrentButon({ result }) {
           content={
             <div className="px-1 py-2">
               <div className="text-small font-bold">Download</div>
-              <div className="text-tiny">{result.torrentDetails.title}</div>
-              <div className="text-tiny">{result.torrentDetails.size}</div>
+              <div className="text-tiny">{firstTorrent.title}</div>
+              <div className="text-tiny">{firstTorrent.size}</div>
             </div>
           }
         >
           <Button
             variant="bordered"
-            onClick={() =>
-              (window.location.href = result.torrentDetails.magnet)
-            }
+            onClick={() => (window.location.href = firstTorrent.magnet)}
           >
-            Download ({result.torrentDetails.size})
+            Download ({firstTorrent.size})
           </Button>
         </Tooltip>
         <Dropdown
@@ -56,26 +56,19 @@ export function TorrentButon({ result }) {
             selectionMode="single"
             className="max-w-[300px]"
           >
-            <DropdownItem
-              description={formatTorrentName(result.torrentDetails?.title)}
-              key="pirate"
-              onClick={() =>
-                (window.location.href = result.torrentDetails.magnet)
-              }
-            >
-              ThePirateBay
-            </DropdownItem>
-            <DropdownItem
-              description={formatTorrentName(
-                result.torrentDetails.torrent9?.title,
-              )}
-              key="torrent9"
-              onClick={() =>
-                (window.location.href = result.torrentDetails.torrent9?.magnet)
-              }
-            >
-              Torrent9
-            </DropdownItem>
+            {Object.keys(result.torrentDetails).map((key) => (
+              <DropdownItem
+                description={formatTorrentName(
+                  result.torrentDetails[key]?.title,
+                )}
+                key={key}
+                onClick={() =>
+                  (window.location.href = result.torrentDetails[key].magnet)
+                }
+              >
+                {key}
+              </DropdownItem>
+            ))}
           </DropdownMenu>
         </Dropdown>
       </ButtonGroup>

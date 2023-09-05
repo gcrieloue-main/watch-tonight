@@ -27,6 +27,7 @@ export function Poster({ watchedIds, result, addWatchdId, removeWatchdId }) {
       <img
         className={result.omdbDetails.imdbRating < 5 ? "grayscale" : ""}
         loading="lazy"
+        alt=""
         src={
           "https://www.themoviedb.org/t/p/w300_and_h450_bestv2" +
           result.details.poster_path
