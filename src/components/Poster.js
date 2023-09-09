@@ -1,18 +1,18 @@
-export function Poster({ watchedIds, result, addWatchdId, removeWatchdId }) {
+export function Poster({ watchedIds, result, addWatchId, removeWatchId }) {
   return (
     <div className="poster">
       {!watchedIds?.includes("" + result.details.id) && (
         <span
           className="watch_action watch__add"
-          onClick={() => addWatchdId(result.details.id)}
+          onClick={() => addWatchId(result.details.id)}
         >
           +
         </span>
       )}
       {watchedIds?.includes("" + result.details.id) && (
         <span
-          className="watch_action watch__add"
-          onClick={() => removeWatchdId(result.details.id)}
+          className="watch_action watch__remove"
+          onClick={() => removeWatchId(result.details.id)}
         >
           -
         </span>

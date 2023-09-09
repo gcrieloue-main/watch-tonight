@@ -88,6 +88,15 @@ function App() {
     });
   }
 
+  function removeWatchdId2(id) {
+    if (watchedIds?.includes("" + id)) {
+      return;
+    }
+    fetch(`http://localhost:3001/watch/${id}`).then(async () => {
+      setWatchedIds((currentWatchIds) => currentWatchIds.concat("" + id));
+    });
+  }
+
   return (
     <div className="App">
       {isLoading && (
@@ -111,8 +120,8 @@ function App() {
               key={result.details.original_title}
               result={result}
               watchedIds={watchedIds}
-              addWatchdId={addWatchdId}
-              removeWatchdId={removeWatchdId}
+              addWatchId={addWatchdId}
+              removeWatchId={removeWatchdId}
             />
           ))}
       </div>

@@ -25,7 +25,7 @@ function mapRatingSource(source) {
   }
 }
 
-export function Movie({ result, watchedIds, addWatchdId, removeWatchdId }) {
+export function Movie({ result, watchedIds, addWatchId, removeWatchId }) {
   return (
     <div className="movie" key={result?.details?.original_title}>
       <h2>{result?.details?.original_title}</h2>
@@ -33,8 +33,8 @@ export function Movie({ result, watchedIds, addWatchdId, removeWatchdId }) {
       <Poster
         watchedIds={watchedIds}
         result={result}
-        addWatchdId={addWatchdId}
-        removeWatchdI={removeWatchdId}
+        addWatchId={addWatchId}
+        removeWatchId={removeWatchId}
       />
       <Ratings
         result={result}
