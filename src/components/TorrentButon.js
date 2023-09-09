@@ -11,13 +11,13 @@ import { ChevronDownIcon } from "./ChevronDownicon";
 import { useState } from "react";
 
 function formatTorrentName(desc) {
-  return desc?.replaceAll(".", " ").replaceAll("5 1", "5.1");
+  return desc?.replaceAll(".", ". ");
 }
 
-export function TorrentButon({ result }) {
+export function TorrentButon({ torrentDetails }) {
   const [dropDownOpen, setDropDownOpen] = useState(false);
 
-  const firstTorrent = Object.values(result.torrentDetails)[0];
+  const firstTorrent = Object.values(torrentDetails)[0];
 
   return (
     firstTorrent?.seeds > 0 && (
@@ -56,17 +56,15 @@ export function TorrentButon({ result }) {
             selectionMode="single"
             className="max-w-[300px]"
           >
-            {Object.keys(result.torrentDetails).map((key) => (
+            {Object.keys(torrentDetails).map((key) => (
               <DropdownItem
-                description={formatTorrentName(
-                  result.torrentDetails[key]?.title,
-                )}
+                description={formatTorrentName(torrentDetails[key]?.title)}
                 key={key}
                 onClick={() =>
-                  (window.location.href = result.torrentDetails[key].magnet)
+                  (window.location.href = torrentDetails[key].magnet)
                 }
               >
-                {key}
+                {torrentDetails[key]?.provider || key}
               </DropdownItem>
             ))}
           </DropdownMenu>

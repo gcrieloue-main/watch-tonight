@@ -41,7 +41,7 @@ export function Movie({ result, watchedIds, addWatchId, removeWatchId }) {
         mapRatingSource={mapRatingSource}
         normalizeRating={normalizeRating}
       />
-      <TorrentButon result={result} />
+      <TorrentButon torrentDetails={result.torrentDetails} />
     </div>
   );
 }

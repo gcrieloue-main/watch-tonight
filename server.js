@@ -1,6 +1,6 @@
 const TorrentSearchApi = require("torrent-search-api");
 TorrentSearchApi.enableProvider("ThePirateBay");
-TorrentSearchApi.enableProvider("Torrent9");
+TorrentSearchApi.enableProvider("Yts");
 
 const express = require("express");
 const fs = require("fs");
@@ -87,6 +87,8 @@ async function getTorrentDetails(title) {
   if (!title) {
     return;
   }
+  let result = {};
+
   const pirateBay = await TorrentSearchApi.search(
     ["ThePirateBay"],
     title,
@@ -96,30 +98,32 @@ async function getTorrentDetails(title) {
 
   const firstPirateBayTorrent = pirateBay[0];
 
-  const torrent9 = await TorrentSearchApi.search(
-    ["Torrent9"],
-    title,
-    "Movies",
-    1,
-  );
+  result = {
+    ...result,
+    pirateBay: { ...firstPirateBayTorrent, provider: "The Pirate Bay" },
+  };
 
-  console.log(title, torrent9);
+  const ytsTorrent = await TorrentSearchApi.search(["Yts"], title, "Movies", 1);
 
-  const firstTorrent9 = torrent9?.[0];
-  const firstTorrent9Magnet = firstTorrent9
-    ? await TorrentSearchApi.getMagnet(torrent9[0])
+  firstTorrent = ytsTorrent?.[0];
+  const firstTorrentMagnet = firstTorrent
+    ? await TorrentSearchApi.getMagnet(firstTorrent)
     : null;
 
-  return {
-    pirateBay: firstPirateBayTorrent,
-    torrent9: { ...firstTorrent9, magnet: firstTorrent9Magnet },
-  };
+  if (firstTorrent) {
+    result = {
+      ...result,
+      yts: { ...firstTorrent, magnet: firstTorrentMagnet, provider: "Yts" },
+    };
+  }
+
+  return result;
 }
 
 async function getData(page, options) {
   console.log("# Query data...");
 
-  const data = await getTmdbMovies(page, options);
+  const data = await memoGetTmdbMovies(page, options);
 
   const resultsWithDetails = await Promise.all(
     data.results?.map(async (data) => {
@@ -169,8 +173,19 @@ const memoGetTmdbMovieDetails = _.memoize(getTmdbMovieDetails);
 const memoGetOmdbMovieDetails = _.memoize(getOmdbMovieDetails);
 const memoGetTorrentDetails = _.memoize(getTorrentDetails);
 const memoGetData = _.memoize(getData, (...args) => JSON.stringify(args));
+const memoGetTmdbMovies = _.memoize(getTmdbMovies, (...args) =>
+  JSON.stringify(args),
+);
 
+// preload
 memoGetData(1);
+memoGetData(2);
+memoGetData(1, { type: "popular" });
+memoGetData(1, { type: "upcoming" });
+memoGetData(1, { type: "now_playing" });
+memoGetData(2, { type: "popular" });
+memoGetData(2, { type: "upcoming" });
+memoGetData(2, { type: "now_playing" });
 
 app.get("/movies", async (req, res) => {
   res.send(await memoGetData(1));
@@ -262,7 +277,8 @@ app.get("/watchedIds", async function (req, res) {
 
 app.get("/watched", async function (req, res) {
   const watchedIds = await loadWatchedMoviesIds();
-  res.send(await loadWatchedMovies(watchedIds));
+  const watchedMovies = await loadWatchedMovies(watchedIds);
+  res.send(watchedMovies);
 });
 
 app.listen(port, () => {
