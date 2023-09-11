@@ -15,23 +15,22 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const { get, response } = useFetch({ data: [] });
 
-  const loadMovies = useCallback(
-    async (url) => {
-      const loadingTimeout = setTimeout(() => {
-        setIsLoading(true);
-      }, 300);
-      const result = await get(url);
-      if (response.ok) setMovies(result);
-      clearTimeout(loadingTimeout);
-      setIsLoading(false);
-    },
-    [get, response],
-  );
+  const CATEGORY_WATCHED = "watched";
 
-  const loadWatchedIds = useCallback(async () => {
+  const loadMovies = async (url) => {
+    const loadingTimeout = setTimeout(() => {
+      setIsLoading(true);
+    }, 300);
+    const result = await get(url);
+    if (response.ok) setMovies(result);
+    clearTimeout(loadingTimeout);
+    setIsLoading(false);
+  };
+
+  const loadWatchedIds = async () => {
     const result = await get("/watchedIds");
     if (response.ok) setWatchedIds(result);
-  }, [get, response]);
+  };
 
   useEffect(() => {
     setPage(1);
@@ -49,7 +48,7 @@ function App() {
   }, [page, category, loadMovies]);
 
   useEffect(() => {
-    if (category === "watched") {
+    if (category === CATEGORY_WATCHED) {
       loadMovies("/watched");
     }
   }, [category, watchedIds, loadMovies]);
@@ -69,31 +68,22 @@ function App() {
   }
 
   function addWatchdId(id) {
-    if (watchedIds?.includes("" + id)) {
+    if (watchedIds?.includes(`${id}`)) {
       return;
     }
     fetch(`http://localhost:3001/watch/${id}`).then(async () => {
-      setWatchedIds((currentWatchIds) => currentWatchIds.concat("" + id));
+      setWatchedIds((currentWatchIds) => currentWatchIds.concat(`${id}`));
     });
   }
 
   function removeWatchdId(id) {
-    if (!watchedIds?.includes("" + id)) {
+    if (!watchedIds?.includes(`${id}`)) {
       return;
     }
     fetch(`http://localhost:3001/watch/delete/${id}`).then(async () => {
       setWatchedIds((currentWatchIds) =>
         currentWatchIds.filter((current) => current !== "" + id),
       );
-    });
-  }
-
-  function removeWatchdId2(id) {
-    if (watchedIds?.includes("" + id)) {
-      return;
-    }
-    fetch(`http://localhost:3001/watch/${id}`).then(async () => {
-      setWatchedIds((currentWatchIds) => currentWatchIds.concat("" + id));
     });
   }
 
@@ -108,7 +98,7 @@ function App() {
       {/* <pre>Watched ids : {JSON.stringify(watchedIds)}</pre> */}
       {/* <pre>{JSON.stringify(movies?.results?.[0], null, 2)}</pre> */}
       <div className={"movies" + (isLoading ? " loading" : " ")}>
-        {category === "watched" && !(movies?.results?.length > 0) && (
+        {category === CATEGORY_WATCHED && !(movies?.results?.length > 0) && (
           <div>
             <p>No watched movie !</p>
           </div>
@@ -125,7 +115,7 @@ function App() {
             />
           ))}
       </div>
-      {category !== "watched" && (
+      {category !== CATEGORY_WATCHED && (
         <Pagination
           category={category}
           page={page}
