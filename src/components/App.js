@@ -1,7 +1,7 @@
 import "./output.css";
 
 import { useFetch } from "use-http";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Spinner } from "@nextui-org/react";
 import { Pagination } from "./Pagination";
 import { Menu } from "./Menu";
@@ -25,10 +25,12 @@ function App() {
     if (response.ok) setMovies(result);
     clearTimeout(loadingTimeout);
     setIsLoading(false);
+    window.scrollTo(0, 0);
   };
 
   const loadWatchedIds = async () => {
-    const result = await get("/watchedIds");
+    const url = "/watchedIds";
+    const result = await get(url);
     if (response.ok) setWatchedIds(result);
   };
 
@@ -37,6 +39,10 @@ function App() {
   }, [category]);
 
   useEffect(() => {
+    if (category === CATEGORY_WATCHED) {
+      return;
+    }
+
     const urls = {
       watched: "watched",
       popular: "movies/popular/" + page,
@@ -45,30 +51,31 @@ function App() {
       default: "movies/" + page,
     };
     loadMovies(urls[category] || urls["default"]);
-  }, [page, category, loadMovies]);
+  }, [page, category]);
 
   useEffect(() => {
     if (category === CATEGORY_WATCHED) {
-      loadMovies("/watched");
+      console.log("load watched movies");
+      const url = "/watched?ids=" + JSON.stringify(watchedIds);
+      loadMovies(url);
     }
-  }, [category, watchedIds, loadMovies]);
+  }, [category, watchedIds]);
 
   useEffect(() => {
     loadWatchedIds();
-  }, [loadWatchedIds]);
+  }, []);
 
   function next() {
     setPage((currentPage) => currentPage + 1);
-    // window.scrollTo(0, 0)
   }
 
   function previous() {
     setPage((currentPage) => currentPage - 1);
-    //  window.scrollTo(0, 0)
   }
 
   function addWatchdId(id) {
     if (watchedIds?.includes(`${id}`)) {
+      console.warn(`${id} already in watchedIds`, watchedIds);
       return;
     }
     fetch(`http://localhost:3001/watch/${id}`).then(async () => {
@@ -78,6 +85,7 @@ function App() {
 
   function removeWatchdId(id) {
     if (!watchedIds?.includes(`${id}`)) {
+      console.warn(`${id} already absent from watchedIds`, watchedIds);
       return;
     }
     fetch(`http://localhost:3001/watch/delete/${id}`).then(async () => {

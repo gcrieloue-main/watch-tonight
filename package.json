@@ -19,8 +19,8 @@
   },
   "scripts": {
     "prettier": "prettier -w ./",
-    "css": "npx tailwindcss -i ./src/App.css -o ./src/components/output.css --watch",
-    "all": "npm-run-all --parallel server start",
+    "css": "npx tailwindcss -i ./src/components/App.css -o ./src/components/output.css --watch",
+    "all": "npm-run-all --parallel css server start",
     "server": "node ./server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",

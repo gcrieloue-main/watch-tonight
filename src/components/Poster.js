@@ -17,15 +17,15 @@ export function Poster({ watchedIds, result, addWatchId, removeWatchId }) {
           -
         </span>
       )}
-      {result.omdbDetails.imdbRating >= 6 &&
-        result.omdbDetails.imdbRating < 7 && (
+      {result.omdbDetails?.imdbRating >= 6 &&
+        result.omdbDetails?.imdbRating < 7 && (
           <span className="approved">✓</span>
         )}
-      {result.omdbDetails.imdbRating >= 7 && (
+      {result.omdbDetails?.imdbRating >= 7 && (
         <span className="approved approved_plus">✓+</span>
       )}
       <img
-        className={result.omdbDetails.imdbRating < 5 ? "grayscale" : ""}
+        className={result.omdbDetails?.imdbRating < 5 ? "grayscale" : ""}
         loading="lazy"
         alt=""
         src={

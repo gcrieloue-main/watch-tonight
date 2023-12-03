@@ -3938,6 +3938,7 @@ h2 {
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   margin: 10px;
+  font-style: italic;
 }
 
 a {
@@ -3968,9 +3969,13 @@ img {
   padding: 10px;
 }
 
+.movie h2 {
+  margin-top: 0;
+}
+
 .movie:hover {
   background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
+  border-radius: 10px;
 }
 
 .download {
@@ -4025,7 +4030,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-bottom: 20px;
+  padding: 20px;
   gap: 10px;
 }
 
@@ -4034,6 +4039,7 @@ img {
   padding: 10px;
   justify-content: center;
   align-items: center;
+  margin-bottom: 10px;
 }
 
 .loading {
