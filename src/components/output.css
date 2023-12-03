@@ -3953,8 +3953,8 @@ img {
 .movies {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(auto-fill, 400px);
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, 380px);
+  gap: 20px;
   grid-auto-rows: minmax(100px, auto);
   justify-content: center;
   padding-bottom: 10px;
@@ -3965,8 +3965,10 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid transparent;
+  border: 1px solid rgba(0, 0, 0, 0.2);
   padding: 10px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
 }
 
 .movie h2 {
@@ -3974,8 +3976,7 @@ img {
 }
 
 .movie:hover {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .download {
