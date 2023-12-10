@@ -1,11 +1,12 @@
 import "./output.css";
 
 import { useFetch } from "use-http";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Spinner } from "@nextui-org/react";
 import { Pagination } from "./Pagination";
 import { Menu } from "./Menu";
 import { Movie } from "./Movie";
+import autoAnimate from "@formkit/auto-animate";
 
 function App() {
   const [movies, setMovies] = useState([]);
@@ -14,6 +15,7 @@ function App() {
   const [category, setCategory] = useState("now_playing");
   const [isLoading, setIsLoading] = useState(false);
   const { get, response } = useFetch({ data: [] });
+  const parent = useRef(null);
 
   const CATEGORY_WATCHED = "watched";
 
@@ -24,8 +26,10 @@ function App() {
     const result = await get(url);
     if (response.ok) setMovies(result);
     clearTimeout(loadingTimeout);
-    setIsLoading(false);
-    window.scrollTo(0, 0);
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+      setIsLoading(false);
+    }, 250); // scroll to top after autoanimate
   };
 
   const loadWatchedIds = async () => {
@@ -33,6 +37,10 @@ function App() {
     const result = await get(url);
     if (response.ok) setWatchedIds(result);
   };
+
+  useEffect(() => {
+    parent.current && autoAnimate(parent.current);
+  }, [parent]);
 
   useEffect(() => {
     setPage(1);
@@ -103,9 +111,7 @@ function App() {
         </div>
       )}
       <Menu setCategory={setCategory} category={category} />
-      {/* <pre>Watched ids : {JSON.stringify(watchedIds)}</pre> */}
-      {/* <pre>{JSON.stringify(movies?.results?.[0], null, 2)}</pre> */}
-      <div className={"movies" + (isLoading ? " loading" : " ")}>
+      <div className={"movies" + (isLoading ? " loading" : " ")} ref={parent}>
         {category === CATEGORY_WATCHED && !(movies?.results?.length > 0) && (
           <div>
             <p>No watched movie !</p>
@@ -115,7 +121,7 @@ function App() {
           ?.filter((result) => result.details.status_code !== 34)
           ?.map((result) => (
             <Movie
-              key={result.details.original_title}
+              key={result.details.title}
               result={result}
               watchedIds={watchedIds}
               addWatchId={addWatchdId}

@@ -114,8 +114,8 @@ async function addTmdbMovieDetail(data) {
     result = {
       ...result,
       details: await memoGetTmdbMovieDetails(data.id),
-      omdbDetails: await memoGetOmdbMovieDetails(data.original_title),
-      torrentDetails: await memoGetTorrentDetails(data.original_title),
+      omdbDetails: await memoGetOmdbMovieDetails(data.title),
+      torrentDetails: await memoGetTorrentDetails(data.title),
     };
   } catch (error) {
     console.log(error);
