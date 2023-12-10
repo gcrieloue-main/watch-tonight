@@ -8,6 +8,12 @@ const _ = require("lodash");
 const app = express();
 const port = 3001;
 
+const movieDbHeaders = {
+  Accept: "application/json",
+  Authorization:
+    "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMWRjOWVhZWY2OTZlNjRhZDYyNjYwYjI1NjBhYjdmYyIsInN1YiI6IjY0ZWE0MjdkNTk0Yzk0MDBhY2IwOGFkYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.91n344WTAJ3PahMIVEBcj1aqE6BQGMBgaXleFtQL2wQ",
+};
+
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
@@ -44,11 +50,7 @@ async function getTmdbMovies(
   console.log(url);
   const data = await (
     await fetch(url, {
-      headers: {
-        Accept: "application/json",
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMWRjOWVhZWY2OTZlNjRhZDYyNjYwYjI1NjBhYjdmYyIsInN1YiI6IjY0ZWE0MjdkNTk0Yzk0MDBhY2IwOGFkYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.91n344WTAJ3PahMIVEBcj1aqE6BQGMBgaXleFtQL2wQ",
-      },
+      headers: movieDbHeaders,
     })
   ).json();
   return data;
@@ -57,11 +59,7 @@ async function getTmdbMovies(
 async function getTmdbMovieDetails(id) {
   return await (
     await fetch(`https://api.themoviedb.org/3/movie/${id}?language=en-US`, {
-      headers: {
-        Accept: "application/json",
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMWRjOWVhZWY2OTZlNjRhZDYyNjYwYjI1NjBhYjdmYyIsInN1YiI6IjY0ZWE0MjdkNTk0Yzk0MDBhY2IwOGFkYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.91n344WTAJ3PahMIVEBcj1aqE6BQGMBgaXleFtQL2wQ",
-      },
+      headers: movieDbHeaders,
     })
   ).json();
 }
@@ -71,8 +69,6 @@ async function getOmdbMovieDetails(title) {
     await fetch(`http://www.omdbapi.com/?apikey=f33929a7&t=` + title, {
       headers: {
         Accept: "application/json",
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMWRjOWVhZWY2OTZlNjRhZDYyNjYwYjI1NjBhYjdmYyIsInN1YiI6IjY0ZWE0MjdkNTk0Yzk0MDBhY2IwOGFkYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.91n344WTAJ3PahMIVEBcj1aqE6BQGMBgaXleFtQL2wQ",
       },
     })
   ).json();
@@ -83,37 +79,19 @@ async function getTorrentDetails(title) {
   if (!title) {
     return;
   }
-  let result = {};
 
   const pirateBay = await TorrentSearchApi.search(
     ["ThePirateBay"],
     title,
     "Video",
-    2,
+    3,
   );
 
-  result = {
-    ...result,
+  return {
     pirateBay: { ...pirateBay[0], provider: "The Pirate Bay" },
     pirateBay2: { ...pirateBay[1], provider: "The Pirate Bay" },
-    pirateBay2: { ...pirateBay[2], provider: "The Pirate Bay" },
+    pirateBay3: { ...pirateBay[2], provider: "The Pirate Bay" },
   };
-
-  const ytsTorrent = await TorrentSearchApi.search(["Yts"], title, "Movies", 1);
-
-  firstTorrent = ytsTorrent?.[0];
-  const firstTorrentMagnet = firstTorrent
-    ? await TorrentSearchApi.getMagnet(firstTorrent)
-    : null;
-
-  if (firstTorrent) {
-    result = {
-      ...result,
-      yts: { ...firstTorrent, magnet: firstTorrentMagnet, provider: "Yts" },
-    };
-  }
-
-  return result;
 }
 
 async function getData(page, options) {
@@ -266,7 +244,6 @@ app.get("/watch/delete/:id", async function (req, res) {
 
 app.get("/watchedIds", async function (req, res) {
   const data = await loadWatchedMoviesIds();
-  // console.log(data);
   res.send(data);
 });
 

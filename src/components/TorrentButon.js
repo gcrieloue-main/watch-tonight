@@ -58,15 +58,13 @@ export function TorrentButon({ torrentDetails }) {
           >
             {Object.keys(torrentDetails).map((key) => (
               <DropdownItem
-                description={formatTorrentName(
-                  `${torrentDetails[key]?.title} (${torrentDetails[key]?.size})`,
-                )}
+                description={formatTorrentName(`${torrentDetails[key]?.title}`)}
                 key={key}
                 onClick={() =>
                   (window.location.href = torrentDetails[key].magnet)
                 }
               >
-                {torrentDetails[key]?.provider || key}
+                {torrentDetails[key]?.size} ({torrentDetails[key]?.seeds} seeds)
               </DropdownItem>
             ))}
           </DropdownMenu>
