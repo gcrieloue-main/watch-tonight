@@ -1,6 +1,29 @@
 import { CircularProgress } from "@nextui-org/react";
 
-export function Ratings({ result, mapRatingSource, normalizeRating }) {
+function mapRatingSource(source) {
+  switch (source) {
+    case "Internet Movie Database":
+      return "IMDB";
+    case "Rotten Tomatoes":
+      return "RT";
+    case "Metacritic":
+      return "MT";
+    default:
+      return source;
+  }
+}
+
+function normalizeRating(rating) {
+  if (rating?.includes("%")) {
+    return +rating.replace(/[^0-9]/g, "");
+  } else if (rating?.includes("/100")) {
+    return +rating.replace("/100", "");
+  } else if (rating?.includes("/10")) {
+    return +rating.replace("/10", "") * 10;
+  } else return 0;
+}
+
+export function Ratings({ result }) {
   return (
     <div className="ratings">
       {result.omdbDetails?.Ratings?.map((rating) => (
