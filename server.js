@@ -92,13 +92,11 @@ async function getTorrentDetails(title) {
     2,
   );
 
-  const firstPirateBayTorrent = pirateBay[0];
-  const secondPirateBayTorrent = pirateBay[1];
-
   result = {
     ...result,
-    pirateBay: { ...firstPirateBayTorrent, provider: "The Pirate Bay" },
-    pirateBay2: { ...secondPirateBayTorrent, provider: "The Pirate Bay" },
+    pirateBay: { ...pirateBay[0], provider: "The Pirate Bay" },
+    pirateBay2: { ...pirateBay[1], provider: "The Pirate Bay" },
+    pirateBay2: { ...pirateBay[2], provider: "The Pirate Bay" },
   };
 
   const ytsTorrent = await TorrentSearchApi.search(["Yts"], title, "Movies", 1);
