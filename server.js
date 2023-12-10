@@ -51,7 +51,6 @@ async function getTmdbMovies(
       },
     })
   ).json();
-  //  console.log(data)
   return data;
 }
 
@@ -68,8 +67,6 @@ async function getTmdbMovieDetails(id) {
 }
 
 async function getOmdbMovieDetails(title) {
-  // const movies =  await (await fetch('http://www.omdbapi.com/?apikey=f33929a7&t=star+wars')).json()
-  // console.log(movies);
   const data = await (
     await fetch(`http://www.omdbapi.com/?apikey=f33929a7&t=` + title, {
       headers: {
@@ -79,7 +76,6 @@ async function getOmdbMovieDetails(title) {
       },
     })
   ).json();
-  // console.log(data)
   return data;
 }
 
@@ -139,13 +135,10 @@ async function getData(page, options) {
 async function addTmdbMovieDetail(data) {
   let result = {};
   try {
-    result = { ...result, details: await memoGetTmdbMovieDetails(data.id) };
     result = {
       ...result,
+      details: await memoGetTmdbMovieDetails(data.id),
       omdbDetails: await memoGetOmdbMovieDetails(data.original_title),
-    };
-    result = {
-      ...result,
       torrentDetails: await memoGetTorrentDetails(data.original_title),
     };
   } catch (error) {
@@ -180,14 +173,16 @@ const memoGetTmdbMovies = _.memoize(getTmdbMovies, (...args) =>
 );
 
 // preload
-memoGetData(1);
-memoGetData(2);
-memoGetData(1, { type: "popular" });
-memoGetData(1, { type: "upcoming" });
-memoGetData(1, { type: "now_playing" });
-memoGetData(2, { type: "popular" });
-memoGetData(2, { type: "upcoming" });
-memoGetData(2, { type: "now_playing" });
+[
+  [1],
+  [2],
+  [1, { type: "popular" }],
+  [1, { type: "upcoming" }],
+  [1, { type: "now_playing" }],
+  [2, { type: "popular" }],
+  [2, { type: "upcoming" }],
+  [2, { type: "now_playing" }],
+].forEach((params) => memoGetData.apply(null, params));
 
 app.get("/movies", async (req, res) => {
   res.send(await memoGetData(1));
