@@ -25,7 +25,9 @@ export function Poster({ watchedIds, result, addWatchId, removeWatchId }) {
         <span className="approved approved_plus">✓+</span>
       )}
       <img
-        className={result.omdbDetails?.imdbRating < 5 ? "grayscale" : ""}
+        className={classNames({
+          grayscale: result.omdbDetails?.imdbRating < 5,
+        })}
         loading="lazy"
         alt=""
         src={

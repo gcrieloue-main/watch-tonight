@@ -7,6 +7,7 @@ import { Pagination } from "./Pagination";
 import { Menu } from "./Menu";
 import { Movie } from "./Movie";
 import autoAnimate from "@formkit/auto-animate";
+import classNames from "classnames";
 
 function App() {
   const [movies, setMovies] = useState([]);
@@ -111,7 +112,10 @@ function App() {
         </div>
       )}
       <Menu setCategory={setCategory} category={category} />
-      <div className={"movies" + (isLoading ? " loading" : " ")} ref={parent}>
+      <div
+        className={classNames("movies", { loading: isLoading })}
+        ref={parent}
+      >
         {category === CATEGORY_WATCHED && !(movies?.results?.length > 0) && (
           <div>
             <p>No watched movie !</p>
