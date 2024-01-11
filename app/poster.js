@@ -1,36 +1,29 @@
-export function Poster({ watchedIds, result, addWatchdId, removeWatchdId }) {
+export function Poster({ watchedIds, result, addWatchedId, removeWatchedId }) {
+  const { id, poster_path } = result.details;
+  const { imdbRating } = result.omdbDetails;
   return (
     <div className="poster">
-      {!watchedIds?.includes("" + result.details.id) && (
+      {!watchedIds?.includes(`${id}`) ? (
         <span
           className="watch_action watch__add"
-          onClick={() => addWatchdId(result.details.id)}
+          onClick={() => addWatchedId(id)}
         >
           +
         </span>
-      )}
-      {watchedIds?.includes("" + result.details.id) && (
+      ) : (
         <span
           className="watch_action watch__add"
-          onClick={() => removeWatchdId(result.details.id)}
+          onClick={() => removeWatchedId(id)}
         >
           -
         </span>
       )}
-      {result.omdbDetails.imdbRating >= 6 &&
-        result.omdbDetails.imdbRating < 7 && (
-          <span className="approved">✓</span>
-        )}
-      {result.omdbDetails.imdbRating >= 7 && (
-        <span className="approved approved_plus">✓+</span>
-      )}
+      {imdbRating >= 6 && imdbRating < 7 && <span className="approved">✓</span>}
+      {imdbRating >= 7 && <span className="approved approved_plus">✓+</span>}
       <img
-        className={result.omdbDetails.imdbRating < 5 ? "grayscale" : ""}
+        className={imdbRating < 5 ? "grayscale" : ""}
         loading="lazy"
-        src={
-          "https://www.themoviedb.org/t/p/w300_and_h450_bestv2" +
-          result.details.poster_path
-        }
+        src={`https://www.themoviedb.org/t/p/w300_and_h450_bestv2${poster_path}`}
       />
     </div>
   );

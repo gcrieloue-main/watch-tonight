@@ -8,6 +8,7 @@ import { Menu } from "./menu";
 import { Movie } from "./movie";
 import autoAnimate from "@formkit/auto-animate";
 import classNames from "classnames";
+import { add } from "lodash";
 
 const API_URL = "/api";
 
@@ -84,7 +85,7 @@ function App() {
     setPage((currentPage) => currentPage - 1);
   }
 
-  function addWatchdId(id) {
+  function addWatchedId(id) {
     if (watchedIds?.includes(`${id}`)) {
       console.warn(`${id} already in watchedIds`, watchedIds);
       return;
@@ -94,7 +95,7 @@ function App() {
     });
   }
 
-  function removeWatchdId(id) {
+  function removeWatchedId(id) {
     if (!watchedIds?.includes(`${id}`)) {
       console.warn(`${id} already absent from watchedIds`, watchedIds);
       return;
@@ -130,8 +131,8 @@ function App() {
               key={result.details.title}
               result={result}
               watchedIds={watchedIds}
-              addWatchId={addWatchdId}
-              removeWatchId={removeWatchdId}
+              addWatchedId={addWatchedId}
+              removeWatchedId={removeWatchedId}
             />
           ))}
       </div>

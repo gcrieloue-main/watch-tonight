@@ -24,13 +24,13 @@ function normalizeRating(rating) {
 }
 
 export function Ratings({ result }) {
+  const { imdb_id, vote_average } = result.details;
+  const { Ratings } = result.omdbDetails;
   return (
     <div className="ratings">
-      {result.omdbDetails?.Ratings?.map((rating) => (
+      {Ratings?.map((rating) => (
         <div key={rating.Source} className="rating">
-          <a
-            href={"https://www.imdb.com/title/" + result.details.imdb_id + "/"}
-          >
+          <a href={"https://www.imdb.com/title/" + imdb_id + "/"}>
             <span>{mapRatingSource(rating.Source)}</span>
             <CircularProgress
               aria-label="Loading..."
@@ -42,17 +42,15 @@ export function Ratings({ result }) {
           </a>
         </div>
       ))}
-      {!result?.omdbDetails?.Ratings?.length && result.details.imdb_id && (
+      {!Ratings?.length && imdb_id && (
         <div className="rating">
-          <a
-            href={"https://www.imdb.com/title/" + result.details.imdb_id + "/"}
-          >
+          <a href={"https://www.imdb.com/title/" + imdb_id + "/"}>
             <span>TMDB</span>
             <CircularProgress
               aria-label="Loading..."
               size="lg"
-              value={result.details.vote_average * 10}
-              color={result.details.vote_average < 6 ? "warning" : "success"}
+              value={vote_average * 10}
+              color={vote_average < 6 ? "warning" : "success"}
               showValueLabel={true}
             />
           </a>
