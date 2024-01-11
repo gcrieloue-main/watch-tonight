@@ -12,28 +12,19 @@ function normalizeRating(rating) {
   } else return 0;
 }
 
-export function Movie({
-  result,
-  watchedIds,
-  addWatchdId,
-  removeWatchdId,
-  mapRatingSource,
-}) {
+export function Movie({ result, watchedIds, addWatchdId, removeWatchdId }) {
+  const { original_title, release_date } = result?.details;
   return (
-    <div className="movie" key={result?.details?.original_title}>
-      <h2>{result?.details?.original_title}</h2>
-      <h3>{result?.details?.release_date}</h3>
+    <div className="movie" key={original_title}>
+      <h2>{original_title}</h2>
+      <h3>{release_date}</h3>
       <Poster
         watchedIds={watchedIds}
         result={result}
         addWatchdId={addWatchdId}
         removeWatchdI={removeWatchdId}
       />
-      <Ratings
-        result={result}
-        mapRatingSource={mapRatingSource}
-        normalizeRating={normalizeRating}
-      />
+      <Ratings result={result} />
       <TorrentButon result={result} />
     </div>
   );
