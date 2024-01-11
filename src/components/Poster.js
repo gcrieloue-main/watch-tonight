@@ -1,3 +1,5 @@
+import classNames from "classnames";
+
 export function Poster({ watchedIds, result, addWatchId, removeWatchId }) {
   return (
     <div className="poster">
