@@ -1,12 +1,18 @@
 const TorrentSearchApi = require("torrent-search-api");
 TorrentSearchApi.enableProvider("ThePirateBay");
-TorrentSearchApi.enableProvider("Torrent9");
+TorrentSearchApi.enableProvider("Yts");
 
 const express = require("express");
 const fs = require("fs");
 const _ = require("lodash");
 const app = express();
 const port = 3001;
+
+const movieDbHeaders = {
+  Accept: "application/json",
+  Authorization:
+    "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMWRjOWVhZWY2OTZlNjRhZDYyNjYwYjI1NjBhYjdmYyIsInN1YiI6IjY0ZWE0MjdkNTk0Yzk0MDBhY2IwOGFkYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.91n344WTAJ3PahMIVEBcj1aqE6BQGMBgaXleFtQL2wQ",
+};
 
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -44,83 +50,54 @@ async function getTmdbMovies(
   console.log(url);
   const data = await (
     await fetch(url, {
-      headers: {
-        Accept: "application/json",
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMWRjOWVhZWY2OTZlNjRhZDYyNjYwYjI1NjBhYjdmYyIsInN1YiI6IjY0ZWE0MjdkNTk0Yzk0MDBhY2IwOGFkYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.91n344WTAJ3PahMIVEBcj1aqE6BQGMBgaXleFtQL2wQ",
-      },
+      headers: movieDbHeaders,
     })
   ).json();
-  //  console.log(data)
   return data;
 }
 
 async function getTmdbMovieDetails(id) {
   return await (
     await fetch(`https://api.themoviedb.org/3/movie/${id}?language=en-US`, {
-      headers: {
-        Accept: "application/json",
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMWRjOWVhZWY2OTZlNjRhZDYyNjYwYjI1NjBhYjdmYyIsInN1YiI6IjY0ZWE0MjdkNTk0Yzk0MDBhY2IwOGFkYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.91n344WTAJ3PahMIVEBcj1aqE6BQGMBgaXleFtQL2wQ",
-      },
+      headers: movieDbHeaders,
     })
   ).json();
 }
 
-const memoGetTmdbMovieDetails = _.memoize(getTmdbMovieDetails);
-
 async function getOmdbMovieDetails(title) {
-  // const movies =  await (await fetch('http://www.omdbapi.com/?apikey=f33929a7&t=star+wars')).json()
-  // console.log(movies);
   const data = await (
     await fetch(`http://www.omdbapi.com/?apikey=f33929a7&t=` + title, {
       headers: {
         Accept: "application/json",
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMWRjOWVhZWY2OTZlNjRhZDYyNjYwYjI1NjBhYjdmYyIsInN1YiI6IjY0ZWE0MjdkNTk0Yzk0MDBhY2IwOGFkYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.91n344WTAJ3PahMIVEBcj1aqE6BQGMBgaXleFtQL2wQ",
       },
     })
   ).json();
-  // console.log(data)
   return data;
 }
-
-const memoGetOmdbMovieDetails = _.memoize(getOmdbMovieDetails);
 
 async function getTorrentDetails(title) {
   if (!title) {
     return;
   }
-  const torrents = await TorrentSearchApi.search(
+
+  const pirateBay = await TorrentSearchApi.search(
     ["ThePirateBay"],
     title,
     "Video",
-    1,
+    3,
   );
-  const torrent9 = await TorrentSearchApi.search(
-    ["Torrent9"],
-    title,
-    "Movies",
-    1,
-  );
-
-  const firstTorrent9 = torrent9?.[0];
-  const firstTorrent9Magnet = firstTorrent9
-    ? await TorrentSearchApi.getMagnet(torrent9[0])
-    : null;
 
   return {
-    ...torrents[0],
-    torrent9: { ...firstTorrent9, magnet: firstTorrent9Magnet },
+    pirateBay: { ...pirateBay[0], provider: "The Pirate Bay" },
+    pirateBay2: { ...pirateBay[1], provider: "The Pirate Bay" },
+    pirateBay3: { ...pirateBay[2], provider: "The Pirate Bay" },
   };
 }
-
-const memoGetTorrentDetails = _.memoize(getTorrentDetails);
 
 async function getData(page, options) {
   console.log("# Query data...");
 
-  const data = await getTmdbMovies(page, options);
+  const data = await memoGetTmdbMovies(page, options);
 
   const resultsWithDetails = await Promise.all(
     data.results?.map(async (data) => {
@@ -131,19 +108,14 @@ async function getData(page, options) {
   return { ...data, results: resultsWithDetails };
 }
 
-const memoGetData = _.memoize(getData, (...args) => JSON.stringify(args));
-
 async function addTmdbMovieDetail(data) {
   let result = {};
   try {
-    result = { ...result, details: await memoGetTmdbMovieDetails(data.id) };
     result = {
       ...result,
-      omdbDetails: await memoGetOmdbMovieDetails(data.original_title),
-    };
-    result = {
-      ...result,
-      torrentDetails: await memoGetTorrentDetails(data.original_title),
+      details: await memoGetTmdbMovieDetails(data.id),
+      omdbDetails: await memoGetOmdbMovieDetails(data.title),
+      torrentDetails: await memoGetTorrentDetails(data.title),
     };
   } catch (error) {
     console.log(error);
@@ -168,7 +140,25 @@ async function loadWatchedMovies(ids) {
   };
 }
 
-memoGetData(1);
+const memoGetTmdbMovieDetails = _.memoize(getTmdbMovieDetails);
+const memoGetOmdbMovieDetails = _.memoize(getOmdbMovieDetails);
+const memoGetTorrentDetails = _.memoize(getTorrentDetails);
+const memoGetData = _.memoize(getData, (...args) => JSON.stringify(args));
+const memoGetTmdbMovies = _.memoize(getTmdbMovies, (...args) =>
+  JSON.stringify(args),
+);
+
+// preload
+[
+  [1],
+  [2],
+  [1, { type: "popular" }],
+  [1, { type: "upcoming" }],
+  [1, { type: "now_playing" }],
+  [2, { type: "popular" }],
+  [2, { type: "upcoming" }],
+  [2, { type: "now_playing" }],
+].forEach((params) => memoGetData.apply(null, params));
 
 app.get("/movies", async (req, res) => {
   res.send(await memoGetData(1));
@@ -254,13 +244,13 @@ app.get("/watch/delete/:id", async function (req, res) {
 
 app.get("/watchedIds", async function (req, res) {
   const data = await loadWatchedMoviesIds();
-  // console.log(data);
   res.send(data);
 });
 
 app.get("/watched", async function (req, res) {
   const watchedIds = await loadWatchedMoviesIds();
-  res.send(await loadWatchedMovies(watchedIds));
+  const watchedMovies = await loadWatchedMovies(watchedIds);
+  res.send(watchedMovies);
 });
 
 app.listen(port, () => {
