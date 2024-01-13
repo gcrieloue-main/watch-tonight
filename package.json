@@ -10,9 +10,8 @@
     "prettier": "prettier -w ./",
     "lint": "next lint",
     "server": "node ./server.js",
-    "css": "npx tailwindcss -i ./app/app.css -o ./app/globals.css --watch",
     "lazypush": "npm run prettier && git cmp 'improve'",
-    "all": "npm-run-all --parallel css server start"
+    "all": "npm-run-all --parallel server dev"
   },
   "dependencies": {
     "@formkit/auto-animate": "^0.8.1",
