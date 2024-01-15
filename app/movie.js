@@ -11,8 +11,8 @@ export function Movie({ result, watchedIds, addWatchedId, removeWatchedId }) {
       <Poster
         watchedIds={watchedIds}
         result={result}
-        addWatchId={addWatchedId}
-        removeWatchId={removeWatchedId}
+        addWatchedId={addWatchedId}
+        removeWatchedId={removeWatchedId}
       />
       <Ratings result={result} />
       {result.torrentDetails && (

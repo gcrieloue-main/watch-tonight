@@ -35,13 +35,9 @@ async function getTmdbMovies(
   let url;
   switch (options.type) {
     case "now_playing":
-      url = `https://api.themoviedb.org/3/movie/now_playing?page=${pageId}`;
-      break;
     case "upcoming":
-      url = `https://api.themoviedb.org/3/movie/upcoming?page=${pageId}`;
-      break;
     case "popular":
-      url = `https://api.themoviedb.org/3/movie/popular?page=${pageId}`;
+      url = `https://api.themoviedb.org/3/movie/${options.type}?page=${pageId}`;
       break;
     default:
       url = `https://api.themoviedb.org/3/discover/movie?with_genres=${options.genre}&vote_average.gte=6&vote_count.gte=10&sort_by=primary_release_date.desc&page=${pageId}`;

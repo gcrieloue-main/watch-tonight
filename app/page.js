@@ -1,7 +1,7 @@
 "use client";
 
 import { useFetch } from "use-http";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Spinner } from "@nextui-org/react";
 import { Pagination } from "./pagination";
 import { Menu } from "./menu";
@@ -23,24 +23,27 @@ function App() {
 
   const CATEGORY_WATCHED = "watched";
 
-  const loadMovies = async (url) => {
-    const loadingTimeout = setTimeout(() => {
-      setIsLoading(true);
-    }, 300);
-    const result = await get(url);
-    if (response.ok) setMovies(result);
-    clearTimeout(loadingTimeout);
-    setTimeout(() => {
-      window.scrollTo(0, 0);
-      setIsLoading(false);
-    }, 250); // scroll to top after autoanimate
-  };
+  const loadMovies = useCallback(
+    async (url) => {
+      const loadingTimeout = setTimeout(() => {
+        setIsLoading(true);
+      }, 300);
+      const result = await get(url);
+      if (response.ok) setMovies(result);
+      clearTimeout(loadingTimeout);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        setIsLoading(false);
+      }, 250); // scroll to top after autoanimate
+    },
+    [get, response],
+  );
 
-  const loadWatchedIds = async () => {
+  const loadWatchedIds = useCallback(async () => {
     const url = `${API_URL}/watchedIds`;
     const result = await get(url);
     if (response.ok) setWatchedIds(result);
-  };
+  }, [get, response]);
 
   useEffect(() => {
     parent.current && autoAnimate(parent.current);
@@ -63,7 +66,7 @@ function App() {
       default: "movies/" + page,
     };
     loadMovies(`${API_URL}/${urls[category] || urls["default"]}`);
-  }, [page, category]);
+  }, [page, category, loadMovies]);
 
   useEffect(() => {
     if (category === CATEGORY_WATCHED) {
@@ -71,11 +74,11 @@ function App() {
       const url = `${API_URL}/watched?ids=${JSON.stringify(watchedIds)}`;
       loadMovies(url);
     }
-  }, [category, watchedIds]);
+  }, [category, watchedIds, loadMovies]);
 
   useEffect(() => {
     loadWatchedIds();
-  }, []);
+  }, [loadWatchedIds]);
 
   function next() {
     setPage((currentPage) => currentPage + 1);

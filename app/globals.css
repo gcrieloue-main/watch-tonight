@@ -82,6 +82,12 @@ img {
 
 .poster {
   position: relative;
+  background: linear-gradient(
+    112.1deg,
+    rgb(32, 38, 57) 11.4%,
+    rgb(63, 76, 119) 70.2%
+  );
+  border-radius: 8px;
 }
 
 .grayscale {
