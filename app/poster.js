@@ -1,9 +1,8 @@
-import Image from "next/image";
-import { useState } from "react";
+import Image from 'next/image'
 
 export function Poster({ watchedIds, result, addWatchedId, removeWatchedId }) {
-  const { id, poster_path } = result.details;
-  const { imdbRating } = result.omdbDetails;
+  const { id, poster_path } = result.details
+  const { imdbRating } = result.omdbDetails
 
   return (
     <div className="poster">
@@ -25,7 +24,7 @@ export function Poster({ watchedIds, result, addWatchedId, removeWatchedId }) {
       {imdbRating >= 6 && imdbRating < 7 && <span className="approved">✓</span>}
       {imdbRating >= 7 && <span className="approved approved_plus">✓+</span>}
       <Image
-        className={imdbRating < 5 ? "grayscale" : ""}
+        className={imdbRating < 5 ? 'grayscale' : ''}
         loading="lazy"
         width="300"
         height="450"
@@ -33,5 +32,5 @@ export function Poster({ watchedIds, result, addWatchedId, removeWatchedId }) {
         alt=""
       />
     </div>
-  );
+  )
 }

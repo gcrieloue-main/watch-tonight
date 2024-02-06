@@ -1,4 +1,4 @@
-import { Button } from "@nextui-org/react";
+import { Button } from '@nextui-org/react'
 
 export function Pagination({ page, previous, next }) {
   return (
@@ -9,5 +9,5 @@ export function Pagination({ page, previous, next }) {
       {page}
       <Button onClick={next}>NEXT</Button>
     </div>
-  );
+  )
 }

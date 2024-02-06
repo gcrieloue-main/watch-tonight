@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 export const ChevronDownIcon = () => (
   <svg
     fill="none"
@@ -12,4 +12,4 @@ export const ChevronDownIcon = () => (
       fill="currentColor"
     />
   </svg>
-);
+)

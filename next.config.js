@@ -3,22 +3,22 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/api/:path*",
-        destination: `http://localhost:3001/:path*`,
+        source: '/api/:path*',
+        destination: 'http://localhost:3001/:path*',
       },
-    ];
+    ]
   },
 
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "www.themoviedb.org",
-        port: "",
-        pathname: "**",
+        protocol: 'https',
+        hostname: 'www.themoviedb.org',
+        port: '',
+        pathname: '**',
       },
     ],
   },
-};
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

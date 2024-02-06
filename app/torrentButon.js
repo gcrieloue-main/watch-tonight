@@ -5,28 +5,28 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-} from "@nextui-org/react";
-import { Tooltip } from "@nextui-org/react";
-import { ChevronDownIcon } from "./ChevronDownicon";
-import { useState } from "react";
+  Tooltip,
+} from '@nextui-org/react'
+import { ChevronDownIcon } from './ChevronDownicon'
+import { useState } from 'react'
 
 function formatTorrentName(desc) {
-  return desc?.replaceAll(".", ". ");
+  return desc?.replaceAll('.', '. ')
 }
 
 export function TorrentButon({ torrentDetails }) {
-  const [dropDownOpen, setDropDownOpen] = useState(false);
+  const [dropDownOpen, setDropDownOpen] = useState(false)
 
-  if (!torrentDetails) return;
+  if (!torrentDetails) return
 
-  const firstTorrent = Object.values(torrentDetails)[0];
+  const firstTorrent = Object.values(torrentDetails)[0]
 
   return (
     firstTorrent?.seeds > 0 && (
       <ButtonGroup variant="flat">
         <Tooltip
           isDisabled={dropDownOpen}
-          placement="bottom"
+          placement="top"
           content={
             <div className="px-1 py-2">
               <div className="text-small font-bold">Download</div>
@@ -73,5 +73,5 @@ export function TorrentButon({ torrentDetails }) {
         </Dropdown>
       </ButtonGroup>
     )
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import { Tabs, Tab } from "@nextui-org/react";
+import { Tabs, Tab } from '@nextui-org/react'
 
 export function Menu({ setCategory, category }) {
   return (
@@ -15,5 +15,5 @@ export function Menu({ setCategory, category }) {
         <Tab key="horror" title="Horror movies" />
       </Tabs>
     </div>
-  );
+  )
 }
