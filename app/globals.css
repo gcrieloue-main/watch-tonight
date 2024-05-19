@@ -16,18 +16,6 @@ h1 {
   margin: 10px;
 }
 
-h2 {
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-wrap: break-word;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  margin: 10px;
-  font-style: italic;
-}
-
 a {
   color: white;
 }
@@ -59,7 +47,16 @@ img {
 }
 
 .movie h2 {
-  margin-top: 0;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  margin: 10px;
+  font-style: italic;
+  padding-right: 2px;
 }
 
 .movie:hover {
@@ -152,17 +149,17 @@ img {
 
 .ratings {
   display: flex;
-  /* gap: 10px; */
-  margin: 10px;
+  gap: 30px;
+  margin: 30px;
 }
 
-.rating a {
+.rating a,
+.rating div {
   flex-direction: column;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 5px;
-  margin: 10px;
+  gap: 10px;
   text-align: center;
 }
 

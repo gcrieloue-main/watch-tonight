@@ -23,7 +23,7 @@ export function TorrentButon({ torrentDetails }) {
 
   return (
     firstTorrent?.seeds > 0 && (
-      <ButtonGroup variant="flat">
+      <ButtonGroup variant="flat" style={{ marginRight: '10px' }}>
         <Tooltip
           isDisabled={dropDownOpen}
           placement="top"

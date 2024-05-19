@@ -97,6 +97,12 @@ function App() {
     })
   }
 
+  function addMovieToRadarr(tmdbId) {
+    fetch(`${API_URL}/add_to_radarr/${tmdbId}`).then(() => {
+      console.log(`add ${tmdbId} to radarr`)
+    })
+  }
+
   function removeWatchedId(id) {
     if (!watchedIds?.includes(`${id}`)) {
       console.warn(`${id} already absent from watchedIds`, watchedIds)
@@ -135,6 +141,7 @@ function App() {
               watchedIds={watchedIds}
               addWatchedId={addWatchedId}
               removeWatchedId={removeWatchedId}
+              addMovieToRadarr={addMovieToRadarr}
             />
           ))}
       </div>

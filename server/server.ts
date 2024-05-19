@@ -1,18 +1,16 @@
-const TorrentSearchApi = require('torrent-search-api')
-TorrentSearchApi.enableProvider('ThePirateBay')
-TorrentSearchApi.enableProvider('Yts')
+import express from 'express'
+import fs from 'fs'
+import _ from 'lodash'
+import {
+  addMovieToRadarr,
+  getOmdbMovieDetails,
+  getTmdbMovieDetails,
+  getTmdbMovies,
+  getTorrentDetails,
+} from './server.api'
 
-const express = require('express')
-const fs = require('fs')
-const _ = require('lodash')
 const app = express()
 const port = 3001
-
-const movieDbHeaders = {
-  Accept: 'application/json',
-  Authorization:
-    'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMWRjOWVhZWY2OTZlNjRhZDYyNjYwYjI1NjBhYjdmYyIsInN1YiI6IjY0ZWE0MjdkNTk0Yzk0MDBhY2IwOGFkYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.91n344WTAJ3PahMIVEBcj1aqE6BQGMBgaXleFtQL2wQ',
-}
 
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
@@ -23,85 +21,19 @@ app.use(function (req, res, next) {
   next()
 })
 
-async function getTmdbMovies(
-  page,
-  options = {
-    genre: 27,
-    type: 'none',
+async function getData(
+  page: number,
+  options?: {
+    genre?: number
+    type?: string
   }
 ) {
-  console.log(page, options)
-  const pageId = page || 1
-  let url
-  switch (options.type) {
-    case 'now_playing':
-    case 'upcoming':
-    case 'popular':
-      url = `https://api.themoviedb.org/3/movie/${options.type}?page=${pageId}`
-      break
-    default:
-      url = `https://api.themoviedb.org/3/discover/movie?with_genres=${options.genre}&vote_average.gte=6&vote_count.gte=10&sort_by=primary_release_date.desc&page=${pageId}`
-  }
-
-  console.log(url)
-  const data = await (
-    await fetch(url, {
-      headers: movieDbHeaders,
-    })
-  ).json()
-  return data
-}
-
-async function getTmdbMovieDetails(id) {
-  return await (
-    await fetch(`https://api.themoviedb.org/3/movie/${id}?language=en-US`, {
-      headers: movieDbHeaders,
-    })
-  ).json()
-}
-
-async function getOmdbMovieDetails(title) {
-  const data = await (
-    await fetch(`http://www.omdbapi.com/?apikey=f33929a7&t=${title}`, {
-      headers: {
-        Accept: 'application/json',
-      },
-    })
-  ).json()
-  return data
-}
-
-async function getTorrentDetails(title) {
-  if (!title) {
-    return
-  }
-
-  try {
-    const pirateBay = await TorrentSearchApi.search(
-      ['ThePirateBay'],
-      title,
-      'Video',
-      3
-    )
-
-    return {
-      pirateBay: { ...pirateBay[0], provider: 'The Pirate Bay' },
-      pirateBay2: { ...pirateBay[1], provider: 'The Pirate Bay' },
-      pirateBay3: { ...pirateBay[2], provider: 'The Pirate Bay' },
-    }
-  } catch (error) {
-    console.error(error)
-    return {}
-  }
-}
-
-async function getData(page, options) {
   console.log('# Query data...')
 
-  const data = await memoGetTmdbMovies(page, options)
+  const data: any = await memoGetTmdbMovies(page, options)
 
   const resultsWithDetails = await Promise.all(
-    data.results?.map(async (data) => {
+    data.results?.map(async (data: any) => {
       return await addTmdbMovieDetail(data)
     })
   )
@@ -109,7 +41,7 @@ async function getData(page, options) {
   return { ...data, results: resultsWithDetails }
 }
 
-async function addTmdbMovieDetail(data) {
+async function addTmdbMovieDetail(data: any) {
   let result = {}
   try {
     result = {
@@ -129,11 +61,11 @@ function loadWatchedMoviesIds() {
   return watched.split('\n').filter((id) => id !== '')
 }
 
-async function loadWatchedMovies(ids) {
+async function loadWatchedMovies(ids: string[]) {
   console.log('# Query Watched Movies...')
   return {
     results: await Promise.all(
-      ids.map(async (id) => {
+      ids.map(async (id: string) => {
         const detail = await memoGetTmdbMovieDetails(id)
         return addTmdbMovieDetail(detail)
       })
@@ -144,13 +76,15 @@ async function loadWatchedMovies(ids) {
 const memoGetTmdbMovieDetails = _.memoize(getTmdbMovieDetails)
 const memoGetOmdbMovieDetails = _.memoize(getOmdbMovieDetails)
 const memoGetTorrentDetails = _.memoize(getTorrentDetails)
-const memoGetData = _.memoize(getData, (...args) => JSON.stringify(args))
-const memoGetTmdbMovies = _.memoize(getTmdbMovies, (...args) =>
+const memoGetTmdbMovies = _.memoize(getTmdbMovies, (...args: any[]) =>
   JSON.stringify(args)
 )
+const memoGetData = _.memoize(getData, (...args: any[]) => JSON.stringify(args))
 
-// preload
-;[
+const cacheParams: [
+  page: number,
+  options?: { genre?: number; type?: string },
+][] = [
   [1],
   [2],
   [1, { type: 'popular' }],
@@ -159,7 +93,11 @@ const memoGetTmdbMovies = _.memoize(getTmdbMovies, (...args) =>
   [2, { type: 'popular' }],
   [2, { type: 'upcoming' }],
   [2, { type: 'now_playing' }],
-].forEach((params) => memoGetData.apply(null, params))
+]
+
+cacheParams.forEach((params) => {
+  memoGetData.apply(null, params)
+})
 
 app.get('/movies', async (req, res) => {
   res.send(await memoGetData(1))
@@ -191,6 +129,12 @@ app.get('/movies/upcoming/:page', async (req, res) => {
   memoGetData(+req.params.page + 1, { type: 'upcoming' })
 })
 
+app.get('/add_to_radarr/:tmdb_id', async (req, res) => {
+  await addMovieToRadarr(req.params.tmdb_id)
+
+  res.send(`${req.params.tmdb_id} added to radarr`)
+})
+
 app.get('/movies/now_playing', async (req, res) => {
   res.send(await memoGetData(1, { type: 'now_playing' }))
 })
@@ -216,7 +160,6 @@ app.get('/watch/:id', async function (req, res) {
   })
 
   console.log('add watched ' + id)
-
   res.send(alreadyWatched.concat([id]))
 })
 
@@ -255,9 +198,5 @@ app.get('/watched', async function (req, res) {
 })
 
 app.listen(port, () => {
-  console.log(
-    'Active torrent providers :',
-    TorrentSearchApi.getActiveProviders()
-  )
   console.log(`Movie DB on port ${port}`)
 })
