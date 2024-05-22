@@ -1,0 +1,16 @@
+
+services:
+
+  back:
+    build: ./server
+    expose:
+      - 3001
+
+  front:
+    build: ./next-app
+    links:
+      - back
+    depends_on:
+      - back
+    ports:
+      - 3010:3000

@@ -2,17 +2,13 @@
   "name": "watch-tonight",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:3001/",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "prettier": "prettier -w ./",
     "lint": "next lint",
-    "server": "node ./server.js",
-    "server-ts": "npx ts-node server/server.ts",
-    "lazypush": "npm run prettier && git cmp 'improve'",
-    "all": "npm-run-all --parallel server dev"
+    "lazypush": "npm run prettier && git cmp 'improve'"
   },
   "dependencies": {
     "@formkit/auto-animate": "^0.8.1",
@@ -27,7 +23,6 @@
     "react": "^18",
     "react-dom": "^18",
     "react-scripts": "5.0.1",
-    "torrent-search-api": "^2.1.4",
     "use-http": "^1.0.28",
     "web-vitals": "^2.1.4"
   },
@@ -41,11 +36,9 @@
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.33.2",
-    "npm-run-all": "^4.1.5",
     "postcss": "^8",
     "prettier": "^3.0.3",
-    "tailwindcss": "^3.3.0",
-    "ts-node": "^10.9.2"
+    "tailwindcss": "^3.3.0"
   },
   "prettier": {
     "trailingComma": "es5",

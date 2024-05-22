@@ -4,7 +4,10 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:3001/:path*',
+        destination:
+          process.env.NODE_ENV === 'production'
+            ? 'http://back:3001/:path*'
+            : 'http://localhost:3001/:path*',
       },
     ]
   },
@@ -19,6 +22,8 @@ const nextConfig = {
       },
     ],
   },
+
+  output: 'standalone',
 }
 
 module.exports = nextConfig
