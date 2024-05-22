@@ -5,6 +5,8 @@ services:
     build: ./server
     expose:
       - 3001
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
 
   front:
     build: ./next-app
@@ -14,3 +16,5 @@ services:
       - back
     ports:
       - 3010:3000
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
