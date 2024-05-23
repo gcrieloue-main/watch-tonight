@@ -22,8 +22,8 @@ COPY *.ts ./
 COPY watch.txt ./
 COPY *.json ./
 
-EXPOSE 3000
+EXPOSE 3001
 
-ENV PORT 3000
+ENV PORT 3001
 
 CMD npx ts-node server.ts
