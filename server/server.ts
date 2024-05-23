@@ -70,6 +70,23 @@ function addIdToWatchedMovies(movieId: string) {
   })
 }
 
+function removeIdFromWatchedMovies(id: string) {
+  const alreadyWatched = loadWatchedMoviesIds()
+  const newIds = alreadyWatched
+    .filter((existingId) => existingId !== id)
+    .join('\n')
+  if (alreadyWatched.includes(id)) {
+    {
+      fs.writeFile(WATCHED_FILE_PATH, newIds, (err) => {
+        if (err) {
+          console.error(err)
+        }
+      })
+    }
+    return newIds
+  }
+}
+
 async function loadWatchedMovies(ids: string[]) {
   console.log('# Query Watched Movies...')
   return {
@@ -146,25 +163,11 @@ app.get('/watch/:id', async function (req, res) {
 
 app.get('/watch/delete/:id', async function (req, res) {
   const id = req.params.id
-  const alreadyWatched = await loadWatchedMoviesIds()
-  if (!alreadyWatched.includes(id)) {
-    res.send(alreadyWatched)
-    return
-  }
 
-  fs.writeFile(
-    WATCHED_FILE_PATH,
-    alreadyWatched.filter((existingId) => existingId !== id).join('\n'),
-    (err) => {
-      if (err) {
-        console.error(err)
-      }
-    }
-  )
-
+  const watchedIds = removeIdFromWatchedMovies(id)
   console.log('remove watched ' + id)
 
-  res.send(alreadyWatched.filter((existingId) => existingId !== id))
+  res.send(watchedIds)
 })
 
 app.get('/watchedIds', async function (_req, res) {
