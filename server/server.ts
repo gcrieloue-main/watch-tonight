@@ -8,6 +8,7 @@ import {
   memoGetTmdbMovies,
   memoGetTorrentDetails,
 } from './server.api'
+import { WATCHED_FILE_PATH } from './config.json'
 
 const app = express()
 const port = process.env.PORT || 3001
@@ -57,8 +58,16 @@ async function addTmdbMovieDetail(data: any) {
 }
 
 function loadWatchedMoviesIds() {
-  const watched = fs.readFileSync('./watch.txt', 'utf8')
+  const watched = fs.readFileSync(WATCHED_FILE_PATH, 'utf8')
   return watched.split('\n').filter((id) => id !== '')
+}
+
+function addIdToWatchedMovies(movieId: string) {
+  fs.appendFile(WATCHED_FILE_PATH, movieId + '\n', (err) => {
+    if (err) {
+      console.error(err)
+    }
+  })
 }
 
 async function loadWatchedMovies(ids: string[]) {
@@ -130,12 +139,7 @@ app.get('/watch/:id', async function (req, res) {
     return
   }
 
-  fs.appendFile('./watch.txt', id + '\n', (err) => {
-    if (err) {
-      console.error(err)
-    }
-  })
-
+  addIdToWatchedMovies(id)
   console.log('add watched ' + id)
   res.send(alreadyWatched.concat([id]))
 })
@@ -149,7 +153,7 @@ app.get('/watch/delete/:id', async function (req, res) {
   }
 
   fs.writeFile(
-    './watch.txt',
+    WATCHED_FILE_PATH,
     alreadyWatched.filter((existingId) => existingId !== id).join('\n'),
     (err) => {
       if (err) {
