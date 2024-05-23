@@ -20,6 +20,7 @@ ENV NODE_ENV production
 
 COPY *.ts ./
 COPY watch.txt ./
+COPY *.json ./
 
 EXPOSE 3000
 
