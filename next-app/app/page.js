@@ -14,8 +14,12 @@ const API_URL = '/api'
 function App() {
   const [movies, setMovies] = useState([])
   const [watchedIds, setWatchedIds] = useState([])
-  const [page, setPage] = useState(1)
-  const [category, setCategory] = useState('now_playing')
+  // const [page, setPage] = useState(1)
+  // const [category, setCategory] = useState('now_playing')
+  const [categoryAndPage, setCategoryAndPage] = useState({
+    category: 'now_playing',
+    page: 1,
+  })
   const [isLoading, setIsLoading] = useState(false)
   const { get, response } = useFetch({ data: [] })
   const parent = useRef(null)
@@ -48,15 +52,7 @@ function App() {
     parent.current && autoAnimate(parent.current)
   }, [parent])
 
-  useEffect(() => {
-    setPage(1)
-  }, [category])
-
-  useEffect(() => {
-    if (category === CATEGORY_WATCHED) {
-      return
-    }
-
+  function loadMoviesFromCategoryAndPage(category, page) {
     const urls = {
       watched: 'watched',
       popular: 'movies/popular/' + page,
@@ -66,26 +62,43 @@ function App() {
       default: 'movies/' + page,
     }
     loadMovies(`${API_URL}/${urls[category] || urls.default}`)
-  }, [page, category, loadMovies])
+  }
 
   useEffect(() => {
-    if (category === CATEGORY_WATCHED) {
+    if (categoryAndPage.category === CATEGORY_WATCHED) {
+      return
+    }
+
+    loadMoviesFromCategoryAndPage(
+      categoryAndPage.category,
+      categoryAndPage.page
+    )
+  }, [categoryAndPage.category, categoryAndPage.page])
+
+  useEffect(() => {
+    if (categoryAndPage.category === CATEGORY_WATCHED) {
       console.log('load watched movies')
       const url = `${API_URL}/watched?ids=${JSON.stringify(watchedIds)}`
       loadMovies(url)
     }
-  }, [category, watchedIds, loadMovies])
+  }, [categoryAndPage, watchedIds])
 
   useEffect(() => {
     loadWatchedIds()
   }, [loadWatchedIds])
 
   function next() {
-    setPage((currentPage) => currentPage + 1)
+    setCategoryAndPage((currentCategoryAndPage) => ({
+      ...currentCategoryAndPage,
+      page: currentCategoryAndPage.page + 1,
+    }))
   }
 
   function previous() {
-    setPage((currentPage) => currentPage - 1)
+    setCategoryAndPage((currentCategoryAndPage) => ({
+      ...currentCategoryAndPage,
+      page: currentCategoryAndPage.page - 1,
+    }))
   }
 
   function addWatchedId(id) {
@@ -123,16 +136,25 @@ function App() {
           <Spinner size="lg" />
         </div>
       )}
-      <Menu setCategory={setCategory} category={category} />
+      <Menu
+        setCategory={(newCategory) => {
+          setCategoryAndPage((currentCategoryAndPage) => ({
+            category: newCategory,
+            page: 1,
+          }))
+        }}
+        category={categoryAndPage.category}
+      />
       <div
         className={classNames('movies', { loading: isLoading })}
         ref={parent}
       >
-        {category === CATEGORY_WATCHED && !(movies?.results?.length > 0) && (
-          <div>
-            <p>No watched movie !</p>
-          </div>
-        )}
+        {categoryAndPage.category === CATEGORY_WATCHED &&
+          !(movies?.results?.length > 0) && (
+            <div>
+              <p>No watched movie !</p>
+            </div>
+          )}
         {movies?.results
           ?.filter((result) => result.details.status_code !== 34)
           ?.map((result) => (
@@ -146,10 +168,10 @@ function App() {
             />
           ))}
       </div>
-      {category !== CATEGORY_WATCHED && (
+      {categoryAndPage.category !== CATEGORY_WATCHED && (
         <Pagination
-          category={category}
-          page={page}
+          category={categoryAndPage.category}
+          page={categoryAndPage.page}
           previous={previous}
           next={next}
           isLoading={isLoading}

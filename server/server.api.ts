@@ -7,6 +7,7 @@ import {
   RADARR_ROOT_FOLDER,
   RADARR_API_URL,
 } from './config.json'
+import { format } from 'date-fns'
 
 TorrentSearchApi.enableProvider('ThePirateBay')
 TorrentSearchApi.enableProvider('Yts')
@@ -47,7 +48,7 @@ async function addMovieToRadarr(tmdbId?: string) {
       }
       return response.json()
     })
-    .then((data) => {
+    .then((_data) => {
       console.log('Movie added to sonar:', tmdbId)
     })
     .catch((reason) => {
@@ -68,12 +69,15 @@ async function getTmdbMovies(
   console.log(page, options)
   const pageId = page || 1
   const tmdbApi = 'https://api.themoviedb.org/3'
+  const minDate = format(new Date(), 'yyyy-MM-dd')
   let url: string
   switch (options.type) {
     case 'now_playing':
-    case 'upcoming':
     case 'popular':
       url = `${tmdbApi}/movie/${options.type}?page=${pageId}`
+      break
+    case 'upcoming':
+      url = `${tmdbApi}/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&with_release_type=2|3&primary_release_date.gte=${minDate}&page=${pageId}`
       break
     case 'best':
       url = `${tmdbApi}/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=vote_average.desc&without_genres=99,10755&vote_count.gte=200&page=${pageId}`
