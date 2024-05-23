@@ -10,9 +10,9 @@ import {
 } from './server.api'
 
 const app = express()
-const port = 3001
+const port = process.env.PORT || 3001
 
-app.use(function (req, res, next) {
+app.use(function (_req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
   res.header(
     'Access-Control-Allow-Headers',
@@ -95,9 +95,7 @@ function loadCache() {
 
 const memoGetData = _.memoize(getData, (...args: any[]) => JSON.stringify(args))
 
-loadCache()
-
-app.get('/movies', async (req, res) => {
+app.get('/movies', async (_req, res) => {
   res.send(await memoGetData(1))
 })
 
@@ -107,51 +105,22 @@ app.get('/movies/:page', async function (req, res) {
   memoGetData(+req.params.page + 1)
 })
 
-app.get('/movies/popular', async (req, res) => {
-  res.send(await memoGetData(1, { type: 'popular' }))
-})
-
-app.get('/movies/popular/:page', async (req, res) => {
-  const movies = await memoGetData(+req.params.page, { type: 'popular' })
-  res.send(movies)
-  memoGetData(+req.params.page + 1, { type: 'popular' })
-})
-
-app.get('/movies/upcoming', async (req, res) => {
-  res.send(await memoGetData(1, { type: 'upcoming' }))
-})
-
-app.get('/movies/upcoming/:page', async (req, res) => {
-  const movies = await memoGetData(+req.params.page, { type: 'upcoming' })
-  res.send(movies)
-  memoGetData(+req.params.page + 1, { type: 'upcoming' })
-})
-
 app.get('/add_to_radarr/:tmdb_id', async (req, res) => {
   await addMovieToRadarr(req.params.tmdb_id)
 
   res.send(`${req.params.tmdb_id} added to radarr`)
 })
 
-app.get('/movies/now_playing', async (req, res) => {
-  res.send(await memoGetData(1, { type: 'now_playing' }))
-})
-
-app.get('/movies/now_playing/:page', async (req, res) => {
-  const movies = await memoGetData(+req.params.page, { type: 'now_playing' })
-  res.send(movies)
-  memoGetData(+req.params.page + 1, { type: 'now_playing' })
-})
-
-app.get('/movies/best', async (req, res) => {
-  res.send(await memoGetData(1, { type: 'best' }))
-})
-
-app.get('/movies/best/:page', async (req, res) => {
-  const movies = await memoGetData(+req.params.page, { type: 'best' })
-  res.send(movies)
-  memoGetData(+req.params.page + 1, { type: 'best' })
-})
+app.get(
+  '/movies/:type(popular|upcoming|now_playing|best)/:page?',
+  async (req, res) => {
+    const movies = await memoGetData(+req.params.page || 1, {
+      type: req.params.type,
+    })
+    res.send(movies)
+    memoGetData(+req.params.page + 1, { type: req.params.type })
+  }
+)
 
 app.get('/watch/:id', async function (req, res) {
   const id = req.params.id
@@ -194,12 +163,12 @@ app.get('/watch/delete/:id', async function (req, res) {
   res.send(alreadyWatched.filter((existingId) => existingId !== id))
 })
 
-app.get('/watchedIds', async function (req, res) {
+app.get('/watchedIds', async function (_req, res) {
   const data = await loadWatchedMoviesIds()
   res.send(data)
 })
 
-app.get('/watched', async function (req, res) {
+app.get('/watched', async function (_req, res) {
   const watchedIds = await loadWatchedMoviesIds()
   const watchedMovies = await loadWatchedMovies(watchedIds)
   res.send(watchedMovies)
@@ -207,4 +176,5 @@ app.get('/watched', async function (req, res) {
 
 app.listen(port, () => {
   console.log(`Movie DB on port ${port}`)
+  loadCache()
 })
