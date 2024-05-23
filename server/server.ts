@@ -3,10 +3,10 @@ import fs from 'fs'
 import _ from 'lodash'
 import {
   addMovieToRadarr,
-  getOmdbMovieDetails,
-  getTmdbMovieDetails,
-  getTmdbMovies,
-  getTorrentDetails,
+  memoGetOmdbMovieDetails,
+  memoGetTmdbMovieDetails,
+  memoGetTmdbMovies,
+  memoGetTorrentDetails,
 } from './server.api'
 
 const app = express()
@@ -73,31 +73,29 @@ async function loadWatchedMovies(ids: string[]) {
   }
 }
 
-const memoGetTmdbMovieDetails = _.memoize(getTmdbMovieDetails)
-const memoGetOmdbMovieDetails = _.memoize(getOmdbMovieDetails)
-const memoGetTorrentDetails = _.memoize(getTorrentDetails)
-const memoGetTmdbMovies = _.memoize(getTmdbMovies, (...args: any[]) =>
-  JSON.stringify(args)
-)
+function loadCache() {
+  const cacheParams: [
+    page: number,
+    options?: { genre?: number; type?: string },
+  ][] = [
+    [1],
+    [2],
+    [1, { type: 'popular' }],
+    [1, { type: 'upcoming' }],
+    [1, { type: 'now_playing' }],
+    [2, { type: 'popular' }],
+    [2, { type: 'upcoming' }],
+    [2, { type: 'now_playing' }],
+  ]
+
+  cacheParams.forEach((params) => {
+    memoGetData.apply(null, params)
+  })
+}
+
 const memoGetData = _.memoize(getData, (...args: any[]) => JSON.stringify(args))
 
-const cacheParams: [
-  page: number,
-  options?: { genre?: number; type?: string },
-][] = [
-  [1],
-  [2],
-  [1, { type: 'popular' }],
-  [1, { type: 'upcoming' }],
-  [1, { type: 'now_playing' }],
-  [2, { type: 'popular' }],
-  [2, { type: 'upcoming' }],
-  [2, { type: 'now_playing' }],
-]
-
-cacheParams.forEach((params) => {
-  memoGetData.apply(null, params)
-})
+loadCache()
 
 app.get('/movies', async (req, res) => {
   res.send(await memoGetData(1))
@@ -143,6 +141,16 @@ app.get('/movies/now_playing/:page', async (req, res) => {
   const movies = await memoGetData(+req.params.page, { type: 'now_playing' })
   res.send(movies)
   memoGetData(+req.params.page + 1, { type: 'now_playing' })
+})
+
+app.get('/movies/best', async (req, res) => {
+  res.send(await memoGetData(1, { type: 'best' }))
+})
+
+app.get('/movies/best/:page', async (req, res) => {
+  const movies = await memoGetData(+req.params.page, { type: 'best' })
+  res.send(movies)
+  memoGetData(+req.params.page + 1, { type: 'best' })
 })
 
 app.get('/watch/:id', async function (req, res) {

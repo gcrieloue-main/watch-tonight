@@ -6,7 +6,7 @@ import {
   RADARR_API_KEY,
   RADARR_ROOT_FOLDER,
   RADARR_API_URL,
-} from './server.config'
+} from './config.json'
 
 TorrentSearchApi.enableProvider('ThePirateBay')
 TorrentSearchApi.enableProvider('Yts')
@@ -16,7 +16,7 @@ const movieDbHeaders = {
   Authorization: `Bearer ${TMDB_API_TOKEN}`,
 }
 
-export async function addMovieToRadarr(tmdbId?: string) {
+async function addMovieToRadarr(tmdbId?: string) {
   await fetch(RADARR_API_URL, {
     method: 'POST',
     headers: {
@@ -55,7 +55,7 @@ export async function addMovieToRadarr(tmdbId?: string) {
     })
 }
 
-export async function getTmdbMovies(
+async function getTmdbMovies(
   page: number,
   options: {
     genre?: number
@@ -67,15 +67,19 @@ export async function getTmdbMovies(
 ) {
   console.log(page, options)
   const pageId = page || 1
-  let url
+  const tmdbApi = 'https://api.themoviedb.org/3'
+  let url: string
   switch (options.type) {
     case 'now_playing':
     case 'upcoming':
     case 'popular':
-      url = `https://api.themoviedb.org/3/movie/${options.type}?page=${pageId}`
+      url = `${tmdbApi}/movie/${options.type}?page=${pageId}`
+      break
+    case 'best':
+      url = `${tmdbApi}/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=vote_average.desc&without_genres=99,10755&vote_count.gte=200&page=${pageId}`
       break
     default:
-      url = `https://api.themoviedb.org/3/discover/movie?with_genres=${options.genre}&vote_average.gte=6&vote_count.gte=10&sort_by=primary_release_date.desc&page=${pageId}`
+      url = `${tmdbApi}/discover/movie?with_genres=${options.genre}&vote_average.gte=6&vote_count.gte=10&sort_by=primary_release_date.desc&page=${pageId}`
   }
 
   console.log(url)
@@ -87,7 +91,7 @@ export async function getTmdbMovies(
   return data
 }
 
-export async function getTmdbMovieDetails(id: string) {
+async function getTmdbMovieDetails(id: string) {
   return await (
     await fetch(`https://api.themoviedb.org/3/movie/${id}?language=en-US`, {
       headers: movieDbHeaders,
@@ -95,7 +99,7 @@ export async function getTmdbMovieDetails(id: string) {
   ).json()
 }
 
-export async function getOmdbMovieDetails(title: string) {
+async function getOmdbMovieDetails(title: string) {
   const data = await (
     await fetch(`http://www.omdbapi.com/?apikey=f33929a7&t=${title}`, {
       headers: {
@@ -106,7 +110,7 @@ export async function getOmdbMovieDetails(title: string) {
   return data
 }
 
-export async function getTorrentDetails(title: string) {
+async function getTorrentDetails(title: string) {
   if (!title) {
     return
   }
@@ -128,4 +132,19 @@ export async function getTorrentDetails(title: string) {
     console.error(error)
     return {}
   }
+}
+
+const memoGetTmdbMovieDetails = _.memoize(getTmdbMovieDetails)
+const memoGetOmdbMovieDetails = _.memoize(getOmdbMovieDetails)
+const memoGetTorrentDetails = _.memoize(getTorrentDetails)
+const memoGetTmdbMovies = _.memoize(getTmdbMovies, (...args: any[]) =>
+  JSON.stringify(args)
+)
+
+export {
+  memoGetTmdbMovieDetails,
+  memoGetOmdbMovieDetails,
+  memoGetTorrentDetails,
+  memoGetTmdbMovies,
+  addMovieToRadarr,
 }

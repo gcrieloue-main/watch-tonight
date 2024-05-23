@@ -12,6 +12,7 @@ export function Menu({ setCategory, category }) {
         <Tab key="upcoming" title="Upcoming" />
         <Tab key="now_playing" title="Now playing" />
         <Tab key="popular" title="Popular movies" />
+        <Tab key="best" title="Best movies" />
         <Tab key="horror" title="Horror movies" />
       </Tabs>
     </div>

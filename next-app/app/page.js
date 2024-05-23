@@ -62,6 +62,7 @@ function App() {
       popular: 'movies/popular/' + page,
       upcoming: 'movies/upcoming/' + page,
       now_playing: 'movies/now_playing/' + page,
+      best: 'movies/best/' + page,
       default: 'movies/' + page,
     }
     loadMovies(`${API_URL}/${urls[category] || urls.default}`)
