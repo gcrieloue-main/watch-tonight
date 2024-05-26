@@ -1,17 +1,13 @@
 import { CircularProgress } from '@nextui-org/react'
 
-function mapRatingSource(source) {
-  switch (source) {
-    case 'Internet Movie Database':
-      return 'IMDB'
-    case 'Rotten Tomatoes':
-      return 'RT'
-    case 'Metacritic':
-      return 'MT'
-    default:
-      return source
-  }
-}
+const ratingSourcesMapping = new Map([
+  ['Internet Movie Database', 'IMDB'],
+  ['Rotten Tomatoes', 'RT'],
+  ['Metacritic', 'MT'],
+])
+
+const mapRatingSource = (source: string): string =>
+  ratingSourcesMapping[source] || source
 
 function normalizeRating(rating) {
   if (rating?.includes('%')) {

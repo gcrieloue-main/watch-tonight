@@ -1,5 +1,4 @@
 import express from 'express'
-import fs from 'fs'
 import _ from 'lodash'
 import {
   addMovieToRadarr,
@@ -7,8 +6,12 @@ import {
   memoGetTmdbMovieDetails,
   memoGetTmdbMovies,
   memoGetTorrentDetails,
-} from './server.api'
-import { WATCHED_FILE_PATH } from './config.json'
+} from './server.service'
+import {
+  loadWatchedMoviesIds,
+  addIdToWatchedMovies,
+  removeIdFromWatchedMovies,
+} from './watched-movies.service'
 
 const app = express()
 const port = process.env.PORT || 3001
@@ -31,59 +34,27 @@ async function getData(
 ) {
   console.log('# Query data...')
 
-  const data: any = await memoGetTmdbMovies(page, options)
+  const tmdbMovieDetails = await memoGetTmdbMovies(page, options)
 
   const resultsWithDetails = await Promise.all(
-    data.results?.map(async (data: any) => {
-      return await addTmdbMovieDetail(data)
+    tmdbMovieDetails.results?.map(async (data: any) => {
+      return await addAdditionalDetails(data)
     })
   )
 
-  return { ...data, results: resultsWithDetails }
+  return { ...tmdbMovieDetails, results: resultsWithDetails }
 }
 
-async function addTmdbMovieDetail(data: any) {
-  let result = {}
+async function addAdditionalDetails(tmdbMovieDetail: any) {
   try {
-    result = {
-      ...result,
-      details: await memoGetTmdbMovieDetails(data.id),
-      omdbDetails: await memoGetOmdbMovieDetails(data.title),
-      torrentDetails: await memoGetTorrentDetails(data.title),
+    return {
+      details: await memoGetTmdbMovieDetails(tmdbMovieDetail.id),
+      omdbDetails: await memoGetOmdbMovieDetails(tmdbMovieDetail.title),
+      torrentDetails: await memoGetTorrentDetails(tmdbMovieDetail.title),
     }
   } catch (error) {
     console.log(error)
-  }
-  return result
-}
-
-function loadWatchedMoviesIds() {
-  const watched = fs.readFileSync(WATCHED_FILE_PATH, 'utf8')
-  return watched.split('\n').filter((id) => id !== '')
-}
-
-function addIdToWatchedMovies(movieId: string) {
-  fs.appendFile(WATCHED_FILE_PATH, movieId + '\n', (err) => {
-    if (err) {
-      console.error(err)
-    }
-  })
-}
-
-function removeIdFromWatchedMovies(id: string) {
-  const alreadyWatched = loadWatchedMoviesIds()
-  const newIds = alreadyWatched
-    .filter((existingId) => existingId !== id)
-    .join('\n')
-  if (alreadyWatched.includes(id)) {
-    {
-      fs.writeFile(WATCHED_FILE_PATH, newIds, (err) => {
-        if (err) {
-          console.error(err)
-        }
-      })
-    }
-    return newIds
+    return {}
   }
 }
 
@@ -93,7 +64,7 @@ async function loadWatchedMovies(ids: string[]) {
     results: await Promise.all(
       ids.map(async (id: string) => {
         const detail = await memoGetTmdbMovieDetails(id)
-        return addTmdbMovieDetail(detail)
+        return addAdditionalDetails(detail)
       })
     ),
   }
@@ -176,7 +147,7 @@ app.get('/watchedIds', async function (_req, res) {
 })
 
 app.get('/watched', async function (_req, res) {
-  const watchedIds = await loadWatchedMoviesIds()
+  const watchedIds = loadWatchedMoviesIds()
   const watchedMovies = await loadWatchedMovies(watchedIds)
   res.send(watchedMovies)
 })

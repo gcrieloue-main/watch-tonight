@@ -57,7 +57,7 @@ async function addMovieToRadarr(tmdbId?: string) {
 }
 
 async function getTmdbMovies(
-  page: number,
+  page = 1,
   options: {
     genre?: number
     type?: string
@@ -67,7 +67,7 @@ async function getTmdbMovies(
   }
 ) {
   console.log(page, options)
-  const pageId = page || 1
+  const pageId = page
   const tmdbApi = 'https://api.themoviedb.org/3'
   const minDate = format(new Date(), 'yyyy-MM-dd')
   let url: string
@@ -128,13 +128,14 @@ async function getTorrentDetails(title: string) {
     )
 
     return {
-      pirateBay: { ...pirateBay[0], provider: 'The Pirate Bay' },
-      pirateBay2: { ...pirateBay[1], provider: 'The Pirate Bay' },
-      pirateBay3: { ...pirateBay[2], provider: 'The Pirate Bay' },
+      pirateBay: pirateBay.map((pirateBayItem: any) => ({
+        ...pirateBayItem,
+        provider: 'The Pirate Bay',
+      })),
     }
   } catch (error) {
-    console.error(error)
-    return {}
+    console.error('Piratebay error on', title, error)
+    return
   }
 }
 

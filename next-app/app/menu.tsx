@@ -1,6 +1,13 @@
 import { Tabs, Tab } from '@nextui-org/react'
+import { Category } from './types'
 
-export function Menu({ setCategory, category }) {
+export function Menu({
+  setCategory,
+  category,
+}: {
+  setCategory: any
+  category: Category
+}) {
   return (
     <div className="flex w-full flex-col menu">
       <Tabs

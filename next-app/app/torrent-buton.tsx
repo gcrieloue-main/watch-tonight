@@ -19,7 +19,7 @@ export function TorrentButon({ torrentDetails }) {
 
   if (!torrentDetails) return
 
-  const firstTorrent = Object.values(torrentDetails)[0]
+  const firstTorrent: any = Object.values(torrentDetails)[0]
 
   return (
     firstTorrent?.seeds > 0 && (

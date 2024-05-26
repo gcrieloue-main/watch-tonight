@@ -5,29 +5,33 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import { Spinner } from '@nextui-org/react'
 import { Pagination } from './pagination'
 import { Menu } from './menu'
-import { Movie } from './movie'
+import { MovieView } from './movie-view'
 import autoAnimate from '@formkit/auto-animate'
 import classNames from 'classnames'
+import { Category, Movies } from './types'
 
 const API_URL = '/api'
 
+type CatgeoryAndPage = {
+  page: number
+  category: Category
+}
+
 function App() {
-  const [movies, setMovies] = useState([])
+  const [movies, setMovies] = useState({ results: [] } as Movies)
   const [watchedIds, setWatchedIds] = useState([])
-  // const [page, setPage] = useState(1)
-  // const [category, setCategory] = useState('now_playing')
   const [categoryAndPage, setCategoryAndPage] = useState({
     category: 'now_playing',
     page: 1,
-  })
+  } as CatgeoryAndPage)
   const [isLoading, setIsLoading] = useState(false)
   const { get, response } = useFetch({ data: [] })
   const parent = useRef(null)
 
-  const CATEGORY_WATCHED = 'watched'
+  const CATEGORY_WATCHED: Category = 'watched'
 
   const loadMovies = useCallback(
-    async (url) => {
+    async (url: string) => {
       const loadingTimeout = setTimeout(() => {
         setIsLoading(true)
       }, 300)
@@ -52,7 +56,7 @@ function App() {
     parent.current && autoAnimate(parent.current)
   }, [parent])
 
-  function loadMoviesFromCategoryAndPage(category, page) {
+  function loadMoviesFromCategoryAndPage(category: Category, page) {
     const urls = {
       watched: 'watched',
       popular: 'movies/popular/' + page,
@@ -155,12 +159,13 @@ function App() {
               <p>No watched movie !</p>
             </div>
           )}
+
         {movies?.results
           ?.filter((result) => result.details.status_code !== 34)
           ?.map((result) => (
-            <Movie
+            <MovieView
               key={result.details.title}
-              result={result}
+              movie={result}
               watchedIds={watchedIds}
               addWatchedId={addWatchedId}
               removeWatchedId={removeWatchedId}
@@ -170,11 +175,9 @@ function App() {
       </div>
       {categoryAndPage.category !== CATEGORY_WATCHED && (
         <Pagination
-          category={categoryAndPage.category}
           page={categoryAndPage.page}
           previous={previous}
           next={next}
-          isLoading={isLoading}
         />
       )}
     </div>

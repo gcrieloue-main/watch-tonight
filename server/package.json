@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "prettier": "prettier -w ./",
-    "server": "npx ts-node ./server.ts"
+    "server": "npx ts-node ./server.ts",
+    "dev": "npx nodemon  ./server.ts"
   },
   "dependencies": {
     "date-fns": "^3.6.0",
@@ -24,6 +25,7 @@
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.33.2",
+    "nodemon": "^3.1.1",
     "prettier": "^3.0.3",
     "ts-node": "^10.9.2"
   },

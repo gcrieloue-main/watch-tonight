@@ -1,6 +1,17 @@
 import Image from 'next/image'
+import { Movie } from './types'
 
-export function Poster({ watchedIds, result, addWatchedId, removeWatchedId }) {
+export function Poster({
+  watchedIds,
+  result,
+  addWatchedId,
+  removeWatchedId,
+}: {
+  watchedIds: string[]
+  result: Movie
+  addWatchedId: (id: string) => void
+  removeWatchedId: (id: string) => void
+}) {
   const { id, poster_path } = result.details
   const { imdbRating } = result.omdbDetails
 
