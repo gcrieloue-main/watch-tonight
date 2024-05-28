@@ -6,8 +6,9 @@ const ratingSourcesMapping = new Map([
   ['Metacritic', 'MT'],
 ])
 
-const mapRatingSource = (source: string): string =>
-  ratingSourcesMapping[source] || source
+const mapRatingSource = (source: string): string => {
+  return ratingSourcesMapping.get(source) || source
+}
 
 function normalizeRating(rating) {
   if (rating?.includes('%')) {

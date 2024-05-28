@@ -35,34 +35,6 @@ img {
   padding-bottom: 10px;
 }
 
-.movie {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  padding: 10px;
-  background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-}
-
-.movie h2 {
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-wrap: break-word;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  margin: 10px;
-  font-style: italic;
-  padding-right: 2px;
-}
-
-.movie:hover {
-  background-color: rgba(0, 0, 0, 0.3);
-}
-
 .download {
   max-width: 300px;
 }

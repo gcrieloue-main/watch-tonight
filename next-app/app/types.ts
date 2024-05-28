@@ -1,5 +1,7 @@
 export type Movie = {
   details: {
+    backdrop_path: any
+    overview: string
     id: string
     title: string
     release_date: string
