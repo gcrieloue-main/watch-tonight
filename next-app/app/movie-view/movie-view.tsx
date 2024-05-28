@@ -109,7 +109,7 @@ export function MovieView({
         {/* <p>{JSON.stringify(movie.omdbDetails)}</p> */}
         <h2>{title}</h2>
         <div className={styles.details}>
-          {movie?.omdbDetails?.director && (
+          {movie?.omdbDetails?.Director && (
             <MovieDetailsContent movie={movie} />
           )}
         </div>
