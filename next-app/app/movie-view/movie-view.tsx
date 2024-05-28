@@ -9,6 +9,37 @@ import { useState } from 'react'
 
 const DOWNLOAD_TORRENT_BUTTON_ENABLED = false
 
+function MovieDetailsContent({ movie }: { movie: Movie }) {
+  return (
+    <>
+      <p>
+        <span className={styles.label}>Director :</span>
+        {movie.omdbDetails.Director}
+      </p>
+      <p>
+        {' '}
+        <span className={styles.label}>Overview :</span>
+        {movie.details.overview}
+      </p>
+      <p>
+        {' '}
+        <span className={styles.label}>Genre :</span>
+        {movie.omdbDetails.Genre}
+      </p>
+      <p>
+        {' '}
+        <span className={styles.label}>Actors :</span>
+        {movie.omdbDetails.Actors}
+      </p>
+      <p>
+        {' '}
+        <span className={styles.label}>Released :</span>
+        {movie.omdbDetails.Released}
+      </p>
+    </>
+  )
+}
+
 export function MovieView({
   watchedIds,
   addWatchedId,
@@ -78,30 +109,9 @@ export function MovieView({
         {/* <p>{JSON.stringify(movie.omdbDetails)}</p> */}
         <h2>{title}</h2>
         <div className={styles.details}>
-          <p>
-            <span className={styles.label}>Director :</span>
-            {movie.omdbDetails.Director}
-          </p>
-          <p>
-            {' '}
-            <span className={styles.label}>Overview :</span>
-            {movie.details.overview}
-          </p>
-          <p>
-            {' '}
-            <span className={styles.label}>Genre :</span>
-            {movie.omdbDetails.Genre}
-          </p>
-          <p>
-            {' '}
-            <span className={styles.label}>Actors :</span>
-            {movie.omdbDetails.Actors}
-          </p>
-          <p>
-            {' '}
-            <span className={styles.label}>Released :</span>
-            {movie.omdbDetails.Released}
-          </p>
+          {movie?.omdbDetails?.director && (
+            <MovieDetailsContent movie={movie} />
+          )}
         </div>
         <Button
           color="primary"
