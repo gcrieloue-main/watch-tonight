@@ -6,7 +6,8 @@ export type Movie = {
     title: string
     release_date: string
     poster_path: string
-    status_code: number
+    status_code?: number
+    [x: string]: any
   }
   omdbDetails?: any
   torrentDetails?: any

@@ -12,7 +12,7 @@ import { Category, Movies } from './types'
 
 const API_URL = '/api'
 
-type CatgeoryAndPage = {
+type CategoryAndPage = {
   page: number
   category: Category
 }
@@ -23,7 +23,7 @@ function App() {
   const [categoryAndPage, setCategoryAndPage] = useState({
     category: 'now_playing',
     page: 1,
-  } as CatgeoryAndPage)
+  } as CategoryAndPage)
   const [isLoading, setIsLoading] = useState(false)
   const { get, response } = useFetch({ data: [] })
   const parent = useRef(null)
@@ -158,6 +158,7 @@ function App() {
             <div>
               <p>No watched movie !</p>
             </div>
+            // eslint-disable-next-line indent
           )}
 
         {movies?.results

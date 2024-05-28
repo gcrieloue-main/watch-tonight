@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import { MovieView } from './movie-view'
 
-//👇 This default export determines where your story goes in the story list
 const meta: Meta<typeof MovieView> = {
   component: MovieView,
 }
