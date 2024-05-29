@@ -10,6 +10,16 @@ export default meta
 type Story = StoryObj<typeof MovieView>
 
 export const Movie: Story = {
+  decorators: [
+    (Story) => (
+      <div
+        className="dark text-foreground bg-background"
+        style={{ padding: '1em' }}
+      >
+        <Story />
+      </div>
+    ),
+  ],
   args: {
     movie: {
       details: {

@@ -34,47 +34,51 @@
 
 .flip {
   position: relative;
-  perspective: 1000px;
-  transition: transform 0.8s;
-  transform-style: preserve-3d;
+  width: 380px;
 
-  &.enabled {
-    transform: rotateY(180deg);
-  }
+  .flipInner {
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
 
-  .front {
-    backface-visibility: hidden;
-    background-color: #22232e;
-  }
+    &.enabled {
+      transform: rotateY(180deg);
+    }
 
-  .back {
-    backface-visibility: hidden;
-    transform: rotateY(180deg);
-    position: absolute;
-    inset: 0;
-    background-color: #22232e;
-    background-size: contain;
-    background-repeat: no-repeat;
-    display: flex;
+    .front {
+      backface-visibility: hidden;
+      background-color: #22232e;
+    }
 
-    .details {
-      flex-grow: 1;
-      p {
-        margin-top: 10px;
+    .back {
+      backface-visibility: hidden;
+      transform: rotateY(180deg);
+      position: absolute;
+      inset: 0;
+      background-color: #22232e;
+      background-size: contain;
+      background-repeat: no-repeat;
+      display: flex;
+
+      .details {
+        flex-grow: 1;
+        p {
+          margin-top: 10px;
+        }
       }
-    }
-    .label {
-      color: #c4fcfc;
-      display: inline-block;
-      min-width: 120px;
-      text-align: right;
-      padding-right: 10px;
-    }
 
-    h2 {
-      height: 140px;
-      display: block;
-      align-content: center;
+      .label {
+        color: #c4fcfc;
+        display: inline-block;
+        min-width: 120px;
+        text-align: right;
+        padding-right: 10px;
+      }
+
+      h2 {
+        height: 140px;
+        display: block;
+        align-content: center;
+      }
     }
   }
 }
