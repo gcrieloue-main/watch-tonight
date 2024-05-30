@@ -39,7 +39,7 @@ export class ServerService {
       },
       body: JSON.stringify({
         tmdbId: tmdbId,
-        qualityProfileId: '1',
+        qualityProfileId: '6',
         rootFolderPath: RADARR_ROOT_FOLDER,
       }),
     })
