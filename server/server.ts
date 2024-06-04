@@ -1,4 +1,3 @@
-import { Category } from './../next-app/app/types'
 import express from 'express'
 import _ from 'lodash'
 import { ServerService } from './server.service'
