@@ -79,24 +79,27 @@ export class ServerService {
       type: 'none',
     }
   ) => {
-    console.log(page, options)
+    console.log('# Query', { ...options, page })
     const pageId = page
     const tmdbApi = 'https://api.themoviedb.org/3'
     const minDate = format(new Date(), 'yyyy-MM-dd')
+    const withGenre = options.genre ? `with_genres=${options.genre}&` : ''
     let url: string
     switch (options.type) {
       case 'now_playing':
+        url = `${tmdbApi}/discover/movie?${withGenre}include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_release_type=2|3&release_date.gte={min_date}&release_date.lte={max_date}&page=${pageId}`
+        break
       case 'popular':
-        url = `${tmdbApi}/movie/${options.type}?page=${pageId}`
+        url = `${tmdbApi}/discover/movie?${withGenre}include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&page=${pageId}`
         break
       case 'upcoming':
-        url = `${tmdbApi}/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&with_release_type=2|3&primary_release_date.gte=${minDate}&page=${pageId}`
+        url = `${tmdbApi}/discover/movie?${withGenre}include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_release_type=2|3&primary_release_date.gte=${minDate}&page=${pageId}`
         break
       case 'best':
-        url = `${tmdbApi}/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=vote_average.desc&without_genres=99,10755&vote_count.gte=200&page=${pageId}`
+        url = `${tmdbApi}/discover/movie?${withGenre}include_adult=false&include_video=false&language=en-US&sort_by=vote_average.desc&without_genres=99,10755&vote_count.gte=200&page=${pageId}`
         break
       default:
-        url = `${tmdbApi}/discover/movie?with_genres=${options.genre}&vote_average.gte=6&vote_count.gte=10&sort_by=primary_release_date.desc&page=${pageId}`
+        url = `${tmdbApi}/discover/movie?${withGenre}vote_average.gte=6&vote_count.gte=10&sort_by=primary_release_date.desc&page=${pageId}`
     }
 
     console.log(url)
@@ -179,8 +182,6 @@ export class ServerService {
       type?: string
     }
   ) => {
-    console.log('# Query data...')
-
     const tmdbMovieDetails = await this.getTmdbMovies(page, options)
 
     const resultsWithDetails = await Promise.all(

@@ -1,3 +1,4 @@
+import { Category } from './../next-app/app/types'
 import express from 'express'
 import _ from 'lodash'
 import { ServerService } from './server.service'
@@ -7,9 +8,14 @@ import {
   removeIdFromWatchedMovies,
 } from './watched-movies.service'
 
+import bodyParser from 'body-parser'
+
 const app = express()
 const port = process.env.PORT || 3001
 const serverService = new ServerService()
+
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
 app.use(function (_req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
@@ -20,14 +26,15 @@ app.use(function (_req, res, next) {
   next()
 })
 
-app.get('/movies', async (_req, res) => {
-  res.send(await serverService.getData(1))
-})
-
-app.get('/movies/:page', async function (req, res) {
-  const movies = await serverService.getData(+req.params.page)
+app.post('/movies', async (req: any, res: any) => {
+  const page = +(req.body.page || 1)
+  const genre = +req.body.genre
+  const movies = await serverService.getData(page, {
+    genre: Number.isNaN(genre) ? undefined : genre,
+    type: req.body.category,
+  })
   res.send(movies)
-  serverService.getData(+req.params.page + 1)
+  serverService.getData(page + 1, { genre })
 })
 
 app.get('/add_to_radarr/:tmdb_id', async (req, res) => {
@@ -35,17 +42,6 @@ app.get('/add_to_radarr/:tmdb_id', async (req, res) => {
 
   res.send(`${req.params.tmdb_id} added to radarr`)
 })
-
-app.get(
-  '/movies/:type(popular|upcoming|now_playing|best)/:page?',
-  async (req, res) => {
-    const movies = await serverService.getData(+req.params.page || 1, {
-      type: req.params.type,
-    })
-    res.send(movies)
-    serverService.getData(+req.params.page + 1, { type: req.params.type })
-  }
-)
 
 app.get('/watch/:id', async function (req, res) {
   const id = req.params.id

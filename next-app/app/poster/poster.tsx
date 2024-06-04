@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import { Movie } from '../types'
-import { useState } from 'react'
 import styles from './styles.module.scss'
 
 export function Poster({
