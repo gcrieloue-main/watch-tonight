@@ -12,25 +12,26 @@ import { Category, Movies } from './types'
 
 const API_URL = '/api'
 
-type CategoryAndPage = {
+type SearchCriteria = {
   page: number
   category: Category
+  genre?: number
 }
 
 function App() {
   const [movies, setMovies] = useState({ results: [] } as Movies)
   const [watchedIds, setWatchedIds] = useState([])
-  const [categoryAndPage, setCategoryAndPage] = useState({
+  const [searchCriteria, setSearchCriteria] = useState({
     category: 'now_playing',
     page: 1,
-  } as CategoryAndPage)
+  } as SearchCriteria)
   const [isLoading, setIsLoading] = useState(false)
-  const { get, response } = useFetch({ data: [] })
+  const { get, response, post } = useFetch({ data: [] })
   const parent = useRef(null)
 
   const CATEGORY_WATCHED: Category = 'watched'
 
-  const loadMovies = useCallback(
+  const getLoadMovies = useCallback(
     async (url: string) => {
       const loadingTimeout = setTimeout(() => {
         setIsLoading(true)
@@ -46,6 +47,22 @@ function App() {
     [get, response]
   )
 
+  const postLoadMovies = useCallback(
+    async (url: string, body: any) => {
+      const loadingTimeout = setTimeout(() => {
+        setIsLoading(true)
+      }, 300)
+      const result = await post(url, body)
+      if (response.ok) setMovies(result)
+      clearTimeout(loadingTimeout)
+      setTimeout(() => {
+        window.scrollTo(0, 0)
+        setIsLoading(false)
+      }, 250) // scroll to top after autoanimate
+    },
+    [post, response]
+  )
+
   const loadWatchedIds = useCallback(async () => {
     const url = `${API_URL}/watchedIds`
     const result = await get(url)
@@ -56,50 +73,52 @@ function App() {
     parent.current && autoAnimate(parent.current)
   }, [parent])
 
-  function loadMoviesFromCategoryAndPage(category: Category, page) {
-    const urls = {
-      watched: 'watched',
-      popular: 'movies/popular/' + page,
-      upcoming: 'movies/upcoming/' + page,
-      now_playing: 'movies/now_playing/' + page,
-      best: 'movies/best/' + page,
-      default: 'movies/' + page,
+  function loadMoviesFromCategoryAndPage(criteria: SearchCriteria) {
+    const { genre, page, category } = criteria
+
+    if (category === 'watched') {
+      getLoadMovies(`${API_URL}/watched}`)
+    } else {
+      const processedSearchCriteria: SearchCriteria = {
+        ...criteria,
+        page: page || 1,
+        genre: genre === 0 ? undefined : genre,
+        category,
+      }
+      console.log('reload movies list', searchCriteria)
+      postLoadMovies(API_URL + '/movies', processedSearchCriteria)
     }
-    loadMovies(`${API_URL}/${urls[category] || urls.default}`)
   }
 
   useEffect(() => {
-    if (categoryAndPage.category === CATEGORY_WATCHED) {
+    if (searchCriteria.category === CATEGORY_WATCHED) {
       return
     }
 
-    loadMoviesFromCategoryAndPage(
-      categoryAndPage.category,
-      categoryAndPage.page
-    )
-  }, [categoryAndPage.category, categoryAndPage.page])
+    loadMoviesFromCategoryAndPage(searchCriteria)
+  }, [searchCriteria.category, searchCriteria.page, searchCriteria.genre])
 
   useEffect(() => {
-    if (categoryAndPage.category === CATEGORY_WATCHED) {
+    if (searchCriteria.category === CATEGORY_WATCHED) {
       console.log('load watched movies')
       const url = `${API_URL}/watched?ids=${JSON.stringify(watchedIds)}`
-      loadMovies(url)
+      getLoadMovies(url)
     }
-  }, [categoryAndPage, watchedIds])
+  }, [searchCriteria, watchedIds])
 
   useEffect(() => {
     loadWatchedIds()
   }, [loadWatchedIds])
 
   function next() {
-    setCategoryAndPage((currentCategoryAndPage) => ({
+    setSearchCriteria((currentCategoryAndPage) => ({
       ...currentCategoryAndPage,
       page: currentCategoryAndPage.page + 1,
     }))
   }
 
   function previous() {
-    setCategoryAndPage((currentCategoryAndPage) => ({
+    setSearchCriteria((currentCategoryAndPage) => ({
       ...currentCategoryAndPage,
       page: currentCategoryAndPage.page - 1,
     }))
@@ -142,18 +161,28 @@ function App() {
       )}
       <Menu
         setCategory={(newCategory) => {
-          setCategoryAndPage((currentCategoryAndPage) => ({
+          console.log({ setCategory: newCategory })
+          setSearchCriteria((searchCriteria) => ({
+            genre: searchCriteria.genre,
             category: newCategory,
             page: 1,
           }))
         }}
-        category={categoryAndPage.category}
+        setGenre={(newGenre) => {
+          console.log({ setGenre: newGenre })
+          setSearchCriteria((searchCriteria) => ({
+            category: searchCriteria.category,
+            genre: newGenre,
+            page: 1,
+          }))
+        }}
       />
+
       <div
         className={classNames('movies', { loading: isLoading })}
         ref={parent}
       >
-        {categoryAndPage.category === CATEGORY_WATCHED &&
+        {searchCriteria.category === CATEGORY_WATCHED &&
           !(movies?.results?.length > 0) && (
             <div>
               <p>No watched movie !</p>
@@ -174,9 +203,9 @@ function App() {
             />
           ))}
       </div>
-      {categoryAndPage.category !== CATEGORY_WATCHED && (
+      {searchCriteria.category !== CATEGORY_WATCHED && (
         <Pagination
-          page={categoryAndPage.page}
+          page={searchCriteria.page}
           previous={previous}
           next={next}
         />

@@ -7,7 +7,7 @@ import {
   DropdownTrigger,
   Tooltip,
 } from '@nextui-org/react'
-import { ChevronDownIcon } from './ChevronDownicon'
+import { ChevronDownIcon } from './chevron-down-icon'
 import { useState } from 'react'
 
 function formatTorrentName(desc) {

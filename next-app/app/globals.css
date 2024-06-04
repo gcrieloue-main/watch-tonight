@@ -49,43 +49,8 @@ img {
   -webkit-box-orient: vertical;
 }
 
-.poster {
-  position: relative;
-  background: linear-gradient(
-    112.1deg,
-    rgb(32, 38, 57) 11.4%,
-    rgb(63, 76, 119) 70.2%
-  );
-  border-radius: 8px;
-}
-
 .grayscale {
   filter: grayscale(0.9);
-}
-
-.approved {
-  font-size: 24px;
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
-}
-
-.watch_action {
-  cursor: pointer;
-  font-size: 24px;
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
-}
-
-.watch_action:hover {
-  text-shadow: 1px 1px 3px rgb(255, 0, 0);
-}
-
-.approved_plus {
-  font-weight: bold;
 }
 
 .buttons {
@@ -140,4 +105,8 @@ img {
   position: fixed;
   top: 50%;
   left: 50%;
+}
+
+.popGenre {
+  margin-left: 1em;
 }

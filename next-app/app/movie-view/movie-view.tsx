@@ -1,4 +1,4 @@
-import { Poster } from '../poster'
+import { Poster } from '../poster/poster'
 import { Ratings } from '../ratings'
 import { TorrentButon } from '../torrent-buton'
 import { Button } from '@nextui-org/react'
