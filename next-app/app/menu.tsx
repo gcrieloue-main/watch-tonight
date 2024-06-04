@@ -10,7 +10,7 @@ export function Menu({
 }: {
   setGenre: (number) => void
   setCategory: (string) => void
-  defaultSelectedKey: Category
+  defaultSelectedKey?: Category
 }) {
   const [internalCategory, setInternalCategory] = useState(
     defaultSelectedKey as Category
