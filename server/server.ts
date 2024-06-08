@@ -28,12 +28,14 @@ app.use(function (_req, res, next) {
 app.post('/movies', async (req: any, res: any) => {
   const page = +(req.body.page || 1)
   const genre = +req.body.genre
-  const movies = await serverService.getData(page, {
-    genre: Number.isNaN(genre) ? undefined : genre,
+  const criteria = {
+    ...(!Number.isNaN(genre) && { genre }),
     type: req.body.category,
-  })
+  }
+  console.log('criteria', criteria)
+  const movies = await serverService.getData(page, criteria)
   res.send(movies)
-  serverService.getData(page + 1, { genre })
+  serverService.getData(page + 1, criteria)
 })
 
 app.get('/add_to_radarr/:tmdb_id', async (req, res) => {

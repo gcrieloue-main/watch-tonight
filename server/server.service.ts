@@ -82,12 +82,17 @@ export class ServerService {
     console.log('# Query', { ...options, page })
     const pageId = page
     const tmdbApi = 'https://api.themoviedb.org/3'
-    const minDate = format(new Date(), 'yyyy-MM-dd')
+    const today = new Date()
+    const minDate = format(today, 'yyyy-MM-dd')
+    const minDateNowPlaying = format(
+      new Date().setDate(today.getDate() - 10),
+      'yyyy-MM-dd'
+    )
     const withGenre = options.genre ? `with_genres=${options.genre}&` : ''
     let url: string
     switch (options.type) {
       case 'now_playing':
-        url = `${tmdbApi}/discover/movie?${withGenre}include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_release_type=2|3&release_date.gte={min_date}&release_date.lte={max_date}&page=${pageId}`
+        url = `${tmdbApi}/discover/movie?${withGenre}include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_release_type=2|3&release_date.gte=${minDateNowPlaying}&release_date.lte=${minDate}&page=${pageId}`
         break
       case 'popular':
         url = `${tmdbApi}/discover/movie?${withGenre}include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&page=${pageId}`

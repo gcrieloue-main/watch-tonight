@@ -82,7 +82,7 @@ function App() {
       const processedSearchCriteria: SearchCriteria = {
         ...criteria,
         page: page || 1,
-        genre: genre === 0 ? undefined : genre,
+        genre: genre ? undefined : genre,
         category,
       }
       console.log('reload movies list', searchCriteria)
