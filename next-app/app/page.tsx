@@ -52,7 +52,9 @@ function App() {
       const loadingTimeout = setTimeout(() => {
         setIsLoading(true)
       }, 300)
+      console.log({ url, body })
       const result = await post(url, body)
+      console.log({ result })
       if (response.ok) setMovies(result)
       clearTimeout(loadingTimeout)
       setTimeout(() => {
@@ -82,10 +84,10 @@ function App() {
       const processedSearchCriteria: SearchCriteria = {
         ...criteria,
         page: page || 1,
-        genre: genre ? undefined : genre,
+        genre: genre || undefined,
         category,
       }
-      console.log('reload movies list', searchCriteria)
+      console.log('reload movies list', searchCriteria, genre)
       postLoadMovies(API_URL + '/movies', processedSearchCriteria)
     }
   }
