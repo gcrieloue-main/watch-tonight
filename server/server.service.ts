@@ -46,7 +46,9 @@ export class ServerService {
       .then((response) => {
         if (!response.ok) {
           return response.json().then((errorData: any) => {
-            if (errorData[0].errorCode !== 'MovieExistsValidator') {
+            if (errorData[0].errorCode === 'MovieExistsValidator') {
+              console.log('Movie already added to radarr')
+            } else {
               console.error(
                 'Network response was not ok:',
                 response.status,
@@ -54,15 +56,13 @@ export class ServerService {
                 errorData
               )
               throw new Error('Network response was not ok')
-            } else {
-              console.log('Movie already added to sonar')
             }
           })
         }
         return response.json()
       })
       .then((_data) => {
-        console.log('Movie added to sonar:', tmdbId)
+        console.log('Movie added to radarr:', tmdbId)
       })
       .catch((reason) => {
         console.log('Error adding to radarr:', reason)

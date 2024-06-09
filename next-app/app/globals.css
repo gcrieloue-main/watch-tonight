@@ -49,10 +49,6 @@ img {
   -webkit-box-orient: vertical;
 }
 
-.grayscale {
-  filter: grayscale(0.9);
-}
-
 .buttons {
   display: flex;
   align-items: center;

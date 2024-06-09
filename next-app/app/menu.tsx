@@ -16,6 +16,8 @@ export function Menu({
     defaultSelectedKey as Category
   )
 
+  const WATCH_LIST_ENABLED = false
+
   return (
     <div className="flex w-full menu">
       <div>
@@ -27,7 +29,7 @@ export function Menu({
             setCategory(category)
           }}
         >
-          <Tab key="watched" title="Watch list" />
+          {WATCH_LIST_ENABLED && <Tab key="watched" title="Watch list" />}
           <Tab key="upcoming" title="Upcoming" />
           <Tab key="now_playing" title="Now playing" />
           <Tab key="popular" title="Popular movies" />

@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { Movie } from '../types'
 import styles from './styles.module.scss'
+import clsx from 'clsx'
 
 export function Poster({
   watchedIds,
@@ -35,11 +36,11 @@ export function Poster({
         <span className={styles.approved}>✓</span>
       )}
       {imdbRating >= 7 && (
-        <span className={styles.approved + ' ' + styles.approvedPlus}>✓+</span>
+        <span className={clsx(styles.approved, styles.approvedPlus)}>✓+</span>
       )}
       {poster_path && (
         <Image
-          className={imdbRating < 5 ? 'grayscale' : ''}
+          className={clsx(imdbRating < 5 && styles.grayscale)}
           loading="lazy"
           width="300"
           height="450"

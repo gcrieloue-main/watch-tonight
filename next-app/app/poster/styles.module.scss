@@ -41,3 +41,7 @@
 .watchAction:hover {
   text-shadow: 1px 1px 3px rgb(255, 0, 0);
 }
+
+.grayscale {
+  filter: grayscale(0.9);
+}
