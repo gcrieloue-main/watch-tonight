@@ -9,6 +9,7 @@ import { MovieView } from './movie-view/movie-view'
 import autoAnimate from '@formkit/auto-animate'
 import classNames from 'classnames'
 import { Category, Movies } from './types'
+import { SignIn } from './sign-in'
 
 const API_URL = '/api'
 
@@ -156,6 +157,7 @@ function App() {
 
   return (
     <div className="App">
+      <SignIn />
       {isLoading && (
         <div className="spinner">
           <Spinner size="lg" />
