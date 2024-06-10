@@ -6,8 +6,8 @@ export function Pagination({
   next,
 }: {
   page: number
-  previous: any
-  next: any
+  previous: () => void
+  next: () => void
 }) {
   return (
     <div className="buttons">

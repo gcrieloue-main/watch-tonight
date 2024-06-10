@@ -1,6 +1,11 @@
+export type Rating = {
+  Source: string
+  Value: string
+}
+
 export type Movie = {
   details: {
-    backdrop_path: any
+    backdrop_path: string
     overview: string
     id: string
     title: string
@@ -9,7 +14,9 @@ export type Movie = {
     status_code?: number
     [x: string]: any
   }
-  omdbDetails?: any
+  omdbDetails?: {
+    Ratings: Rating[]
+  }
   torrentDetails?: any
 }
 export type Movies = { results: Movie[] }

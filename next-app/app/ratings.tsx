@@ -1,4 +1,5 @@
 import { CircularProgress } from '@nextui-org/react'
+import { Movie, Rating } from './types'
 
 const ratingSourcesMapping = new Map([
   ['Internet Movie Database', 'IMDB'],
@@ -7,10 +8,10 @@ const ratingSourcesMapping = new Map([
 ])
 
 const mapRatingSource = (source: string): string => {
-  return ratingSourcesMapping.get(source) || source
+  return ratingSourcesMapping.get(source) ?? source
 }
 
-function normalizeRating(rating) {
+function normalizeRating(rating: string) {
   if (rating?.includes('%')) {
     return +rating.replace(/[^0-9]/g, '')
   } else if (rating?.includes('/100')) {
@@ -20,7 +21,7 @@ function normalizeRating(rating) {
   } else return 0
 }
 
-function omdbRatings(Ratings, imdb_id) {
+function omdbRatings(Ratings: Rating[], imdb_id: number) {
   return (
     <>
       {Ratings?.map((rating) => (
@@ -58,7 +59,7 @@ function omdbRatings(Ratings, imdb_id) {
   )
 }
 
-export function Ratings({ result }) {
+export function Ratings({ result }: { result: Movie }) {
   const { imdb_id, vote_average, id } = result.details
   const { Ratings } = result.omdbDetails
   return (
@@ -79,7 +80,7 @@ export function Ratings({ result }) {
       )}
       {omdbRatings(Ratings, imdb_id)}
       {(!Ratings?.length ||
-        !Ratings?.some((rating) => rating.Ratings === 'TMDB')) && (
+        !Ratings?.some((rating) => rating.Source === 'TMDB')) && (
         <div className="rating">
           <a href={`https://www.themoviedb.org/movie/${id}/`}>
             <span>TMDB</span>
