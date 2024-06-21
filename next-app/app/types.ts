@@ -21,6 +21,7 @@ export type Movie = {
     Genre: string
     Director: string
     Ratings: Rating[]
+    [x: string]: any
   }
   torrentDetails?: any
 }
