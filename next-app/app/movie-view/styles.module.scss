@@ -82,3 +82,21 @@
     }
   }
 }
+
+.ratings {
+  display: flex;
+  gap: 30px;
+  margin: 30px;
+}
+
+.rating {
+  a,
+  div {
+    flex-direction: column;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+  }
+}

@@ -1,7 +1,9 @@
 import { Tabs, Tab } from '@nextui-org/react'
 import { GenreSelector } from './genre-selector'
 import { useState } from 'react'
-import { Category } from './types'
+import { Category } from '../types'
+import styles from './styles.module.scss'
+import { clsx } from 'clsx'
 
 export function Menu({
   setGenre,
@@ -19,7 +21,7 @@ export function Menu({
   const WATCH_LIST_ENABLED = false
 
   return (
-    <div className="flex w-full menu">
+    <div className={clsx('flex w-full', styles.menu)}>
       <div>
         <Tabs
           defaultSelectedKey={defaultSelectedKey}
@@ -36,7 +38,7 @@ export function Menu({
           <Tab key="best" title="Best movies" />
         </Tabs>
       </div>
-      <div className="popGenre">
+      <div className={styles.popGenre}>
         <GenreSelector
           setGenre={setGenre}
           isDisabled={internalCategory === 'watched'}

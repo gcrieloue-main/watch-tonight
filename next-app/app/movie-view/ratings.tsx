@@ -1,5 +1,6 @@
 import { CircularProgress } from '@nextui-org/react'
-import { Movie, Rating } from './types'
+import { Movie, Rating } from '../types'
+import styles from './styles.module.scss'
 
 const ratingSourcesMapping = new Map([
   ['Internet Movie Database', 'IMDB'],
@@ -63,9 +64,9 @@ export function Ratings({ result }: { result: Movie }) {
   const { imdb_id, vote_average, id } = result.details
   const { Ratings } = result.omdbDetails
   return (
-    <div className="ratings">
+    <div className={styles.ratings}>
       {!Ratings?.length && imdb_id && (
-        <div className="rating">
+        <div className={styles.rating}>
           <a href={`https://www.imdb.com/title/${imdb_id}/`}>
             <span>IMDB</span>
             <CircularProgress
@@ -81,7 +82,7 @@ export function Ratings({ result }: { result: Movie }) {
       {omdbRatings(Ratings, imdb_id)}
       {(!Ratings?.length ||
         !Ratings?.some((rating) => rating.Source === 'TMDB')) && (
-        <div className="rating">
+        <div className={styles.rating}>
           <a href={`https://www.themoviedb.org/movie/${id}/`}>
             <span>TMDB</span>
             <CircularProgress
