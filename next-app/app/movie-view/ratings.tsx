@@ -26,7 +26,7 @@ function omdbRatings(Ratings: Rating[], imdb_id: number) {
   return (
     <>
       {Ratings?.map((rating) => (
-        <div key={rating.Source} className="rating">
+        <div key={rating.Source} className={styles.rating}>
           {mapRatingSource(rating.Source) === 'IMDB' ? (
             <a href={`https://www.imdb.com/title/${imdb_id}/`}>
               <span>{mapRatingSource(rating.Source)}</span>

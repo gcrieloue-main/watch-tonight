@@ -12,6 +12,7 @@
     "date-fns": "^3.6.0",
     "express": "^4.19.2",
     "lodash": "^4.17.21",
+    "node-cache": "^5.1.2",
     "torrent-search-api": "^2.1.4",
     "use-http": "^1.0.28"
   },

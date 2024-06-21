@@ -1,6 +1,5 @@
 // @ts-ignore
 import TorrentSearchApi from 'torrent-search-api'
-import _ from 'lodash'
 import {
   TMDB_API_TOKEN,
   RADARR_API_KEY,
@@ -8,21 +7,16 @@ import {
   RADARR_API_URL,
 } from './config.json'
 import { format } from 'date-fns'
+import NodeCache from 'node-cache'
 
 export class ServerService {
+  private cache: NodeCache
+  private TTL = 3600
   constructor() {
     TorrentSearchApi.enableProvider('ThePirateBay')
     TorrentSearchApi.enableProvider('Yts')
 
-    this.getTmdbMovieDetails = _.memoize(this.getTmdbMovieDetails)
-    this.getOmdbMovieDetails = _.memoize(this.getOmdbMovieDetails)
-    this.getTorrentDetails = _.memoize(this.getTorrentDetails)
-    this.getTmdbMovies = _.memoize(this.getTmdbMovies, (...args: any[]) =>
-      JSON.stringify(args)
-    )
-    this.getData = _.memoize(this.getData, (...args: any[]) =>
-      JSON.stringify(args)
-    )
+    this.cache = new NodeCache()
   }
 
   movieDbHeaders = {
@@ -79,6 +73,13 @@ export class ServerService {
       type: 'none',
     }
   ) => {
+    const cacheKey = 'tmdb_movies_' + JSON.stringify({ page, options })
+
+    if (this.cache.has(cacheKey)) {
+      console.log({ cacheKey })
+      return this.cache.get(cacheKey)
+    }
+
     console.log('# Query', { ...options, page })
     const pageId = page
     const tmdbApi = 'https://api.themoviedb.org/3'
@@ -108,36 +109,68 @@ export class ServerService {
     }
 
     console.log(url)
-    const data = await (
+
+    const result = await (
       await fetch(url, {
         headers: this.movieDbHeaders,
       })
     ).json()
-    return data
+
+    this.cache.set(cacheKey, result, 3600)
+
+    return result
   }
 
   getTmdbMovieDetails = async (id: string) => {
-    return await (
+    const cacheKey = 'tmdb_movie_details_' + id
+
+    if (this.cache.has(cacheKey)) {
+      console.log({ cacheKey })
+      return this.cache.get(cacheKey)
+    }
+
+    const result = await (
       await fetch(`https://api.themoviedb.org/3/movie/${id}?language=en-US`, {
         headers: this.movieDbHeaders,
       })
     ).json()
+
+    this.cache.set(cacheKey, result, 3600)
+
+    return result
   }
 
   getOmdbMovieDetails = async (title: string) => {
-    const data = await (
+    const cacheKey = 'omdb_movie_details_' + title
+
+    if (this.cache.has(cacheKey)) {
+      console.log({ cacheKey })
+      return this.cache.get(cacheKey)
+    }
+
+    const result = await (
       await fetch(`http://www.omdbapi.com/?apikey=f33929a7&t=${title}`, {
         headers: {
           Accept: 'application/json',
         },
       })
     ).json()
-    return data
+
+    this.cache.set(cacheKey, result, 3600)
+
+    return result
   }
 
   getTorrentDetails = async (title: string) => {
     if (!title) {
       return
+    }
+
+    const cacheKey = 'torrent_details_' + title
+
+    if (this.cache.has(cacheKey)) {
+      console.log({ cacheKey })
+      return this.cache.get(cacheKey)
     }
 
     try {
@@ -148,12 +181,16 @@ export class ServerService {
         3
       )
 
-      return {
+      const result = {
         pirateBay: pirateBay.map((pirateBayItem: any) => ({
           ...pirateBayItem,
           provider: 'The Pirate Bay',
         })),
       }
+
+      this.cache.set(cacheKey, result, 3600)
+
+      return result
     } catch (error) {
       console.error('Piratebay error on', title, error)
       return
