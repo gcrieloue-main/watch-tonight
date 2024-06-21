@@ -15,7 +15,7 @@ export type Movie = {
     [x: string]: any
   }
   omdbDetails?: {
-    imdbRating: number
+    imdbRating: number | string
     Released: string
     Actors: string
     Genre: string
