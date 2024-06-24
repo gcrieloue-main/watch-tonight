@@ -6,6 +6,7 @@ name: publish-client
 # documentation.
 
 on:
+  workflow_dispatch:
   push:
     branches: ['auth']
     # Publish semver tags as releases.
