@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/gcrieloue-main/watch-tonight-client
+  repository: ghcr.io/gcrieloue-main/watch-tonight-server
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: auth
@@ -41,10 +41,10 @@ securityContext: {}
 
 service:
   type: NodePort
-  port: 3000
+  port: 3001
   exposePort: 30000
-  targetPort: 3000
-  internalPort: 3000
+  targetPort: 3001
+  internalPort: 3001
 
 ingress:
   enabled: false
