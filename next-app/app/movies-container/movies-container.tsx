@@ -84,7 +84,7 @@ export function MoviesContainer() {
         category,
       }
       console.log('reload movies list', searchCriteria, genre)
-      postLoadMovies(API_URL + '/movies', processedSearchCriteria)
+      postLoadMovies(`${API_URL}/movies`, processedSearchCriteria)
     }
   }
 
