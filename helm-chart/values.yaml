@@ -41,7 +41,7 @@ securityContext: {}
 
 service:
   type: NodePort
-  exposePort: 3000
+  exposePort: 30000
   targetPort: 3000
   internalPort: 3000
 
