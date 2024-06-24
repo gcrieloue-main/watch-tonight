@@ -6,12 +6,10 @@ import { Spinner } from '@nextui-org/react'
 import { Pagination } from './pagination'
 import { Menu } from './menu'
 import { Category, Movies } from '../types'
-import { SignIn } from '../sign-in/sign-in'
 import { MoviesView } from '../movies-view/movies-view'
 import styles from './styles.module.scss'
 
 const API_URL = '/api'
-const SIGN_IN_ENABLED = false
 
 type SearchCriteria = {
   page: number
