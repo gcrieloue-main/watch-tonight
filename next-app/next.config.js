@@ -8,7 +8,7 @@ const nextConfig = {
         source: '/api/:path*',
         destination:
           process.env.NODE_ENV === 'production'
-            ? serverUrl + '/:path*'
+            ? `${serverUrl}/:path*`
             : 'http://localhost:3001/:path*',
       },
     ]

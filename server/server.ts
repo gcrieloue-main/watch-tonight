@@ -48,12 +48,12 @@ app.get('/watch/:id', async function (req, res) {
   const id = req.params.id
   const alreadyWatched = await loadWatchedMoviesIds()
   if (alreadyWatched.includes(id)) {
-    res.send(id + ' already added')
+    res.send(`${id} already added`)
     return
   }
 
   addIdToWatchedMovies(id)
-  console.log('add watched ' + id)
+  console.log(`add watched ${id}`)
   res.send(alreadyWatched.concat([id]))
 })
 
@@ -61,7 +61,7 @@ app.get('/watch/delete/:id', async function (req, res) {
   const id = req.params.id
 
   const watchedIds = removeIdFromWatchedMovies(id)
-  console.log('remove watched ' + id)
+  console.log(`remove watched ${id}`)
 
   res.send(watchedIds)
 })
