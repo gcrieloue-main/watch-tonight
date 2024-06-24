@@ -8,7 +8,7 @@ image:
   repository: ghcr.io/gcrieloue-main/watch-tonight-client
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: auth
+  tag: v4
 
 imagePullSecrets: []
 nameOverride: ""
