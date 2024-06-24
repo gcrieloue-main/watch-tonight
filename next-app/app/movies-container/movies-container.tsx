@@ -8,7 +8,6 @@ import { Menu } from './menu'
 import { Category, Movies } from '../types'
 import { SignIn } from '../sign-in/sign-in'
 import { MoviesView } from '../movies-view/movies-view'
-import { Session } from 'next-auth'
 import styles from './styles.module.scss'
 
 const API_URL = '/api'
@@ -20,7 +19,7 @@ type SearchCriteria = {
   genre?: number
 }
 
-export function MoviesContainer({ session }: { session: Session }) {
+export function MoviesContainer() {
   const [movies, setMovies] = useState({ results: [] } as Movies)
   const [watchedIds, setWatchedIds] = useState([])
   const [searchCriteria, setSearchCriteria] = useState({
@@ -153,7 +152,6 @@ export function MoviesContainer({ session }: { session: Session }) {
 
   return (
     <div className="App">
-      {SIGN_IN_ENABLED && <SignIn session={session} />}
       {isLoading && (
         <div className={styles.spinner}>
           <Spinner size="lg" />
