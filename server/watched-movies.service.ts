@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { WATCHED_FILE_PATH } from './config.json'
+import { WATCHED_FILE_PATH } from './config'
 
 export function loadWatchedMoviesIds() {
   const watched = fs.readFileSync(WATCHED_FILE_PATH, 'utf8')

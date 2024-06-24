@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+
+const serverUrl = process.env.SERVER_URL || 'http://back:3001'
 const nextConfig = {
   async rewrites() {
     return [
@@ -6,7 +8,7 @@ const nextConfig = {
         source: '/api/:path*',
         destination:
           process.env.NODE_ENV === 'production'
-            ? 'http://back:3001/:path*'
+            ? serverUrl + '/:path*'
             : 'http://localhost:3001/:path*',
       },
     ]

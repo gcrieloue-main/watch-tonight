@@ -1,11 +1,6 @@
 // @ts-ignore
 import TorrentSearchApi from 'torrent-search-api'
-import {
-  TMDB_API_TOKEN,
-  RADARR_API_KEY,
-  RADARR_ROOT_FOLDER,
-  RADARR_API_URL,
-} from './config.json'
+import config from './config'
 import { format } from 'date-fns'
 import NodeCache from 'node-cache'
 
@@ -21,20 +16,20 @@ export class ServerService {
 
   movieDbHeaders = {
     Accept: 'application/json',
-    Authorization: `Bearer ${TMDB_API_TOKEN}`,
+    Authorization: `Bearer ${config.TMDB_API_TOKEN}`,
   }
 
   addMovieToRadarr = async (tmdbId?: string) => {
-    await fetch(RADARR_API_URL, {
+    await fetch(config.RADARR_API_URL, {
       method: 'POST',
       headers: {
-        'X-Api-Key': RADARR_API_KEY,
+        'X-Api-Key': config.RADARR_API_KEY,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         tmdbId: tmdbId,
         qualityProfileId: '6',
-        rootFolderPath: RADARR_ROOT_FOLDER,
+        rootFolderPath: config.RADARR_ROOT_FOLDER,
       }),
     })
       .then((response) => {
