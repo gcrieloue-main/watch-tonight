@@ -1,13 +1,13 @@
 'use client'
 
-import { useFetch } from 'use-http'
-import { useEffect, useState, useCallback } from 'react'
+import { useState } from 'react'
 import { Spinner } from '@nextui-org/react'
 import { Pagination } from './pagination'
 import { Menu } from './menu'
 import { Category, Movies } from '../types'
 import { MoviesView } from '../movies-view/movies-view'
 import styles from './styles.module.scss'
+import { useQuery } from 'react-query'
 
 const API_URL = '/api'
 
@@ -17,94 +17,49 @@ type SearchCriteria = {
   genre?: number
 }
 
+function minDelay<T>(promise: Promise<T>, delay: number): Promise<T> {
+  return new Promise((resolve) => {
+    const startMs = Date.now()
+
+    promise.then((result) => {
+      const timeSpent = Date.now() - startMs
+
+      if (timeSpent > delay) {
+        resolve(result)
+      } else {
+        setTimeout(() => {
+          resolve(result)
+        }, delay - timeSpent)
+      }
+    })
+  })
+}
+
 export function MoviesContainer() {
-  const [movies, setMovies] = useState({ results: [] } as Movies)
-  const [watchedIds, setWatchedIds] = useState([])
   const [searchCriteria, setSearchCriteria] = useState({
     category: 'now_playing',
     page: 1,
   } as SearchCriteria)
-  const [isLoading, setIsLoading] = useState(false)
-  const { get, response, post } = useFetch({ data: [] })
-
-  const CATEGORY_WATCHED: Category = 'watched'
-
-  const getLoadMovies = useCallback(
-    async (url: string) => {
-      const loadingTimeout = setTimeout(() => {
-        setIsLoading(true)
-      }, 300)
-      const result = await get(url)
-      if (response.ok) setMovies(result)
-      clearTimeout(loadingTimeout)
-      setTimeout(() => {
-        window.scrollTo(0, 0)
-        setIsLoading(false)
-      }, 250) // scroll to top after autoanimate
+  const { data, isLoading } = useQuery({
+    queryKey: ['movies', searchCriteria],
+    queryFn: (key): Promise<Movies> => {
+      return minDelay(
+        fetch(`${API_URL}/movies`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          method: 'POST',
+          body: JSON.stringify(searchCriteria),
+        }).then((res) => {
+          setTimeout(() => {
+            window.scrollTo(0, 0)
+          }, 250) // scroll to top after autoanimate
+          return res.json()
+        }),
+        500
+      )
     },
-    [get, response]
-  )
-
-  const postLoadMovies = useCallback(
-    async (url: string, body: any) => {
-      const loadingTimeout = setTimeout(() => {
-        setIsLoading(true)
-      }, 300)
-      console.log({ url, body })
-      const result = await post(url, body)
-      console.log({ result })
-      if (response.ok) setMovies(result)
-      clearTimeout(loadingTimeout)
-      setTimeout(() => {
-        window.scrollTo(0, 0)
-        setIsLoading(false)
-      }, 250) // scroll to top after autoanimate
-    },
-    [post, response]
-  )
-
-  const loadWatchedIds = useCallback(async () => {
-    const url = `${API_URL}/watchedIds`
-    const result = await get(url)
-    if (response.ok) setWatchedIds(result)
-  }, [get, response])
-
-  function loadMoviesFromCategoryAndPage(criteria: SearchCriteria) {
-    const { genre, page, category } = criteria
-
-    if (category === 'watched') {
-      getLoadMovies(`${API_URL}/watched}`)
-    } else {
-      const processedSearchCriteria: SearchCriteria = {
-        ...criteria,
-        page: page || 1,
-        genre: genre || undefined,
-        category,
-      }
-      console.log('reload movies list', searchCriteria, genre)
-      postLoadMovies(`${API_URL}/movies`, processedSearchCriteria)
-    }
-  }
-
-  useEffect(() => {
-    if (searchCriteria.category === CATEGORY_WATCHED) {
-      return
-    }
-
-    loadMoviesFromCategoryAndPage(searchCriteria)
-  }, [searchCriteria.category, searchCriteria.page, searchCriteria.genre])
-
-  useEffect(() => {
-    if (searchCriteria.category === CATEGORY_WATCHED) {
-      console.log('load watched movies')
-      const url = `${API_URL}/watched?ids=${JSON.stringify(watchedIds)}`
-      getLoadMovies(url)
-    }
-  }, [searchCriteria, watchedIds])
-
-  useEffect(() => {
-    loadWatchedIds()
-  }, [loadWatchedIds])
+  })
 
   function next() {
     setSearchCriteria((currentCategoryAndPage) => ({
@@ -120,31 +75,9 @@ export function MoviesContainer() {
     }))
   }
 
-  function addWatchedId(id) {
-    if (watchedIds?.includes(`${id}`)) {
-      console.warn(`${id} already in watchedIds`, watchedIds)
-      return
-    }
-    fetch(`${API_URL}/watch/${id}`).then(async () => {
-      setWatchedIds((currentWatchIds) => currentWatchIds.concat(`${id}`))
-    })
-  }
-
   function addMovieToRadarr(tmdbId) {
     fetch(`${API_URL}/add_to_radarr/${tmdbId}`).then(() => {
       console.log(`add ${tmdbId} to radarr`)
-    })
-  }
-
-  function removeWatchedId(id) {
-    if (!watchedIds?.includes(`${id}`)) {
-      console.warn(`${id} already absent from watchedIds`, watchedIds)
-      return
-    }
-    fetch(`${API_URL}/watch/delete/${id}`).then(async () => {
-      setWatchedIds((currentWatchIds) =>
-        currentWatchIds.filter((current) => current !== '' + id)
-      )
     })
   }
 
@@ -173,17 +106,13 @@ export function MoviesContainer() {
           }))
         }}
       />
-
       <MoviesView
-        movies={movies}
-        watchedIds={watchedIds}
+        movies={data}
         isLoading={isLoading}
         addMovieToRadarr={addMovieToRadarr}
-        addWatchedId={addWatchedId}
-        removeWatchedId={removeWatchedId}
         searchCriteria={searchCriteria}
       />
-      {searchCriteria.category !== CATEGORY_WATCHED && (
+      {searchCriteria.category !== 'watched' && (
         <Pagination
           page={searchCriteria.page}
           previous={previous}

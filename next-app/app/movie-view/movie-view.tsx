@@ -37,15 +37,9 @@ function MovieDetailsContent({ movie }: { movie: Movie }) {
 }
 
 export function MovieView({
-  watchedIds,
-  addWatchedId,
-  removeWatchedId,
   addMovieToRadarr,
   movie,
 }: {
-  watchedIds: any
-  addWatchedId: any
-  removeWatchedId: any
   addMovieToRadarr: any
   movie: Movie
 }) {
@@ -60,12 +54,7 @@ export function MovieView({
         <div className={styles.movie}>
           <h2>{title}</h2>
           <h3>{release_date}</h3>
-          <Poster
-            watchedIds={watchedIds}
-            result={movie}
-            addWatchedId={addWatchedId}
-            removeWatchedId={removeWatchedId}
-          />
+          <Poster result={movie} />
           <Ratings result={movie} />
           <div className="download-buttons">
             {movie.torrentDetails && DOWNLOAD_TORRENT_BUTTON_ENABLED && (

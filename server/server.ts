@@ -26,13 +26,15 @@ app.use(function (_req, res, next) {
 })
 
 app.post('/movies', async (req: any, res: any) => {
+  console.log('req', req.body)
+
   const page = +(req.body.page || 1)
   const genre = +req.body.genre
   const criteria = {
     ...(!Number.isNaN(genre) && { genre }),
     type: req.body.category,
   }
-  console.log('criteria', criteria)
+  console.log('criteria', { ...criteria, page })
   const movies = await serverService.getData(page, criteria)
   res.send(movies)
   serverService.getData(page + 1, criteria)

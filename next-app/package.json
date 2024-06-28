@@ -24,8 +24,8 @@
     "next": "14.0.4",
     "react": "^18",
     "react-dom": "^18",
+    "react-query": "^3.39.3",
     "react-scripts": "5.0.1",
-    "use-http": "^1.0.28",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {

@@ -68,7 +68,7 @@ export class ServerService {
       type: 'none',
     }
   ) => {
-    const cacheKey = 'tmdb_movies_' + JSON.stringify({ page, options })
+    const cacheKey = `tmdb_movies_${JSON.stringify({ page, options })}`
 
     if (this.cache.has(cacheKey)) {
       console.log({ cacheKey })
@@ -117,7 +117,7 @@ export class ServerService {
   }
 
   getTmdbMovieDetails = async (id: string) => {
-    const cacheKey = 'tmdb_movie_details_' + id
+    const cacheKey = `tmdb_movie_details_${id}`
 
     if (this.cache.has(cacheKey)) {
       console.log({ cacheKey })
@@ -136,7 +136,7 @@ export class ServerService {
   }
 
   getOmdbMovieDetails = async (title: string) => {
-    const cacheKey = 'omdb_movie_details_' + title
+    const cacheKey = `omdb_movie_details_${title}`
 
     if (this.cache.has(cacheKey)) {
       console.log({ cacheKey })
@@ -161,7 +161,7 @@ export class ServerService {
       return
     }
 
-    const cacheKey = 'torrent_details_' + title
+    const cacheKey = `torrent_details_${title}`
 
     if (this.cache.has(cacheKey)) {
       console.log({ cacheKey })

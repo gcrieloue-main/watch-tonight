@@ -2,9 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scrollbar-color: rgba(0 0 0 / 0.5) rgb(70, 75, 83);
+}
+
 body {
   justify-content: center;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 main {

@@ -9,17 +9,11 @@ export function MoviesView({
   isLoading,
   movies,
   searchCriteria,
-  watchedIds,
   addMovieToRadarr,
-  addWatchedId,
-  removeWatchedId,
 }: {
   isLoading: boolean
   movies: Movies
   searchCriteria: any
-  watchedIds: any
-  addWatchedId: (any) => void
-  removeWatchedId: (any) => void
   addMovieToRadarr: (any) => void
 }) {
   const parent = useRef(null)
@@ -48,9 +42,6 @@ export function MoviesView({
           <MovieView
             key={result.details.title}
             movie={result}
-            watchedIds={watchedIds}
-            addWatchedId={addWatchedId}
-            removeWatchedId={removeWatchedId}
             addMovieToRadarr={addMovieToRadarr}
           />
         ))}
