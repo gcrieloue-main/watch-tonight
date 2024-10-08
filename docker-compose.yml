@@ -3,6 +3,7 @@ services:
 
   back:
     build: ./server
+    restart: always
     expose:
       - 3001
     labels:
@@ -10,6 +11,7 @@ services:
 
   front:
     build: ./next-app
+    restart: always
     links:
       - back
     depends_on:
