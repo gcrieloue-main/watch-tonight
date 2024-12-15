@@ -8,26 +8,23 @@ import { clsx } from 'clsx'
 export function Menu({
   setGenre,
   setCategory,
-  defaultSelectedKey = 'now_playing',
+  selectedCategory = 'now_playing',
+  selectedGenre,
 }: {
   setGenre: (number) => void
   setCategory: (string) => void
-  defaultSelectedKey?: Category
+  selectedCategory?: Category
+  selectedGenre?: number
 }) {
-  const [internalCategory, setInternalCategory] = useState(
-    defaultSelectedKey as Category
-  )
-
   const WATCH_LIST_ENABLED = false
 
   return (
     <div className={clsx('flex w-full', styles.menu)}>
       <div>
         <Tabs
-          defaultSelectedKey={defaultSelectedKey}
+          selectedKey={selectedCategory}
           aria-label="Tabs radius"
           onSelectionChange={(category) => {
-            setInternalCategory(category as Category)
             setCategory(category)
           }}
         >
@@ -40,8 +37,9 @@ export function Menu({
       </div>
       <div className={styles.popGenre}>
         <GenreSelector
+          selectedGenre={selectedGenre}
           setGenre={setGenre}
-          isDisabled={internalCategory === 'watched'}
+          isDisabled={selectedCategory === 'watched'}
         />
       </div>
     </div>

@@ -1,21 +1,15 @@
 'use client'
 
-import { useState } from 'react'
 import { Spinner } from '@nextui-org/react'
 import { Pagination } from './pagination'
 import { Menu } from './menu'
-import { Category, Movies } from '../types'
+import { Movies, SearchCriteria } from '../types'
 import { MoviesView } from '../movies-view/movies-view'
 import styles from './styles.module.scss'
 import { useQuery } from 'react-query'
+import { useRouter } from 'next/navigation'
 
 const API_URL = '/api'
-
-type SearchCriteria = {
-  page: number
-  category: Category
-  genre?: number
-}
 
 function minDelay<T>(promise: Promise<T>, delay: number): Promise<T> {
   return new Promise((resolve) => {
@@ -35,11 +29,13 @@ function minDelay<T>(promise: Promise<T>, delay: number): Promise<T> {
   })
 }
 
-export function MoviesContainer() {
-  const [searchCriteria, setSearchCriteria] = useState({
-    category: 'now_playing',
-    page: 1,
-  } as SearchCriteria)
+export function MoviesContainer({
+  searchCriteria,
+}: {
+  searchCriteria: SearchCriteria
+}) {
+  const router = useRouter()
+
   const { data, isLoading } = useQuery({
     queryKey: ['movies', searchCriteria],
     queryFn: (key): Promise<Movies> => {
@@ -51,6 +47,7 @@ export function MoviesContainer() {
           method: 'POST',
           body: JSON.stringify(searchCriteria),
         }).then((res) => {
+          console.log('why')
           setTimeout(() => {
             window.scrollTo(0, 0)
           }, 250) // scroll to top after autoanimate
@@ -62,17 +59,19 @@ export function MoviesContainer() {
   })
 
   function next() {
-    setSearchCriteria((currentCategoryAndPage) => ({
-      ...currentCategoryAndPage,
-      page: currentCategoryAndPage.page + 1,
-    }))
+    router.push(
+      `/${searchCriteria.category}/${searchCriteria.genre}/${
+        searchCriteria.page + 1
+      }`
+    )
   }
 
   function previous() {
-    setSearchCriteria((currentCategoryAndPage) => ({
-      ...currentCategoryAndPage,
-      page: currentCategoryAndPage.page - 1,
-    }))
+    router.push(
+      `/${searchCriteria.category}/${searchCriteria.genre}/${
+        searchCriteria.page - 1
+      }`
+    )
   }
 
   function addMovieToRadarr(tmdbId) {
@@ -90,21 +89,13 @@ export function MoviesContainer() {
       )}
       <Menu
         setCategory={(newCategory) => {
-          console.log({ setCategory: newCategory })
-          setSearchCriteria((searchCriteria) => ({
-            genre: searchCriteria.genre,
-            category: newCategory,
-            page: 1,
-          }))
+          router.push(`/${newCategory}/${searchCriteria.genre}/1`)
         }}
         setGenre={(newGenre) => {
-          console.log({ setGenre: newGenre })
-          setSearchCriteria((searchCriteria) => ({
-            category: searchCriteria.category,
-            genre: newGenre,
-            page: 1,
-          }))
+          router.push(`/${searchCriteria.category}/${newGenre}/1`)
         }}
+        selectedCategory={searchCriteria.category}
+        selectedGenre={searchCriteria.genre}
       />
       <MoviesView
         movies={data}

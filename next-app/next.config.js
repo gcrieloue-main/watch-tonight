@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 
+const { redirect } = require('next/dist/server/api-utils')
+
 const serverUrl = process.env.SERVER_URL || 'http://back:3001'
 const nextConfig = {
   async rewrites() {
@@ -32,6 +34,16 @@ const nextConfig = {
   },
 
   output: 'standalone',
+
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/popular/0/1',
+        permanent: true,
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig

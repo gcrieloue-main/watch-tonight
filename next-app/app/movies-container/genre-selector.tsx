@@ -5,16 +5,16 @@ import {
   DropdownItem,
   Button,
 } from '@nextui-org/react'
-import { useState } from 'react'
 
 export function GenreSelector({
+  selectedGenre,
   setGenre,
   isDisabled = false,
 }: {
+  selectedGenre: number
   setGenre: (number) => void
   isDisabled: boolean
 }) {
-  const [selectedKey, setSelectedKey] = useState(0)
   const genres = [
     { key: 0, label: 'All genres' },
     { key: 27, label: 'Horror' },
@@ -29,7 +29,7 @@ export function GenreSelector({
         <Button variant="bordered" className="capitalize">
           {isDisabled
             ? 'N/A'
-            : genres.find((genre) => genre.key === selectedKey).label}
+            : genres.find((genre) => genre.key === selectedGenre)?.label}
         </Button>
       </DropdownTrigger>
       <DropdownMenu
@@ -42,7 +42,6 @@ export function GenreSelector({
         onSelectionChange={(selection) => {
           if (!isDisabled) {
             const genreId = +Array.from(selection)[0]
-            setSelectedKey(genreId)
             setGenre(genreId)
           }
         }}

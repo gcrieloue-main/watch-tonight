@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import { MovieView } from '../movie-view/movie-view'
-import autoAnimate from '@formkit/auto-animate'
 import clsx from 'clsx'
 import { Category, Movies } from '../types'
 import styles from './styles.module.scss'
@@ -17,10 +16,6 @@ export function MoviesView({
   addMovieToRadarr: (any) => void
 }) {
   const parent = useRef(null)
-
-  useEffect(() => {
-    parent.current && autoAnimate(parent.current)
-  }, [parent])
 
   const CATEGORY_WATCHED: Category = 'watched'
   return (

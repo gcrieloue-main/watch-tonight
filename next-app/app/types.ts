@@ -25,6 +25,7 @@ export type Movie = {
   }
   torrentDetails?: any
 }
+
 export type Movies = { results: Movie[] }
 export type Category =
   | 'now_playing'
@@ -32,3 +33,9 @@ export type Category =
   | 'popular'
   | 'best'
   | 'upcoming'
+
+export type SearchCriteria = {
+  page: number
+  category: Category
+  genre?: number
+}
