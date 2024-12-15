@@ -20,3 +20,5 @@ services:
       - 3010:3000
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
+      - "traefik.enable=true"
+      - "traefik.http.routers.mycustomcontainer.rule=PathPrefix(`/watch-tonight`)"

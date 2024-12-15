@@ -1,6 +1,5 @@
 import { Tabs, Tab } from '@nextui-org/react'
 import { GenreSelector } from './genre-selector'
-import { useState } from 'react'
 import { Category } from '../types'
 import styles from './styles.module.scss'
 import { clsx } from 'clsx'

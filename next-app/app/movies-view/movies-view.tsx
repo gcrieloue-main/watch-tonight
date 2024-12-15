@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { MovieView } from '../movie-view/movie-view'
 import clsx from 'clsx'
 import { Category, Movies } from '../types'
